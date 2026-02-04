@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Browser - Powered by Gemini</title>
+    <style>
+        :root {
+            --bg-color: #1e1e2e;
+            --sidebar-bg: #11111b;
+            --text-color: #cdd6f4;
+            --accent-color: #89b4fa;
+            --secondary-accent: #f38ba8;
+            --input-bg: #313244;
+            --border-color: #45475a;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Left Panel - Command Center */
+        #sidebar {
+            width: 30%;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        textarea {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 10px;
+            border-radius: 8px;
+            resize: none;
+            height: 80px;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: 2px solid var(--accent-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            flex: 1;
+        }
+
+        #btn-start {
+            background-color: var(--accent-color);
+            color: #111;
+        }
+
+        #btn-stop {
+            background-color: var(--secondary-accent);
+            color: #111;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        #stats-container {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--accent-color);
+            font-family: 'Fira Code', monospace;
+        }
+
+        #logs-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 10px;
+            min-height: 0;
+            /* Important for nested flex scroll */
+        }
+
+        #logs-header {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6c7086;
+            margin-bottom: 5px;
+            flex-shrink: 0;
+        }
+
+        #logs {
+            flex-grow: 1;
+            background-color: #000;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            color: #a6e3a1;
+            scroll-behavior: smooth;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 2px;
+        }
+
+        .log-timestamp {
+            color: #6c7086;
+            margin-right: 8px;
+        }
+
+        /* Right Panel - Browser View */
+        #main-view {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+        }
+
+        #nav-bar {
+            height: 50px;
+            background-color: var(--bg-color);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        #url-input {
+            flex-grow: 1;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-family: inherit;
+        }
+
+        #url-input:focus {
+            outline: 2px solid var(--accent-color);
+        }
+
+        #btn-go {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #browser-view {
+            flex-grow: 1;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Left Panel -->
+    <div id="sidebar">
+        <h1>🤖 Agent Control</h1>
+
+        <div class="control-group">
+            <label for="goal-input">User Goal</label>
+            <textarea id="goal-input" placeholder="e.g. Go to Google and search for 'Electron JS'"></textarea>
+        </div>
+
+        <div class="button-group">
+            <button id="btn-start">Start Agent</button>
+            <button id="btn-stop" disabled>Stop</button>
+        </div>
+
+        <div style="height: 20px;"></div>
+
+        <div id="stats-container">
+            <div class="stat-item">
+                <span>⏱️ Time:</span>
+                <span id="stat-time" class="stat-value">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span>🤖 API Calls:</span>
+                <span id="stat-api" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+                <span>🪙 Tokens:</span>
+                <span id="stat-tokens" class="stat-value">0</span>
+            </div>
+        </div>
+
+        <div id="logs-container">
+            <div id="logs-header">Activity Log</div>
+            <div id="logs">
+                <div class="log-entry"><span class="log-timestamp">[System]</span> Ready to help.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div id="main-view">
+        <div id="nav-bar">
+            <input type="text" id="url-input" value="https://www.google.com" placeholder="Enter URL">
+            <button id="btn-go">Go</button>
+        </div>
+        <!-- IMPORTANT: nodeintegration must be enabled in main process -->
+        <webview id="browser-view" src="https://www.google.com"></webview>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        const webview = document.getElementById('browser-view');
+        const urlInput = document.getElementById('url-input');
+        const btnGo = document.getElementById('btn-go');
+        const btnStart = document.getElementById('btn-start');
+        const btnStop = document.getElementById('btn-stop');
+        const goalInput = document.getElementById('goal-input');
+        const logsDiv = document.getElementById('logs');
+
+        // --- Navigation Logic ---
+        const navigate = () => {
+            let url = urlInput.value;
+            if (!url.startsWith('http')) {
+                url = 'https://' + url;
+            }
+            webview.loadURL(url);
+        };
+
+        btnGo.addEventListener('click', navigate);
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') navigate();
+        });
+
+        // Sync URL bar
+        webview.addEventListener('did-navigate', (e) => {
+            urlInput.value = e.url;
+        });
+        webview.addEventListener('did-navigate-in-page', (e) => {
+            urlInput.value = e.url;
+        });
+
+        // --- Agent Logic ---
+
+        // Log Helper
+        const addLog = (msg) => {
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `<span class="log-timestamp">[${time}]</span> ${msg}`;
+            logsDiv.appendChild(div);
+            // Ensure scroll happens after layout update
+            requestAnimationFrame(() => {
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+            });
+        };
+
+        btnStart.addEventListener('click', () => {
+            const goal = goalInput.value.trim();
+            if (!goal) {
+                addLog('⚠️ Please enter a goal first.');
+                return;
+            }
+
+            btnStart.disabled = true;
+            btnStop.disabled = false;
+            goalInput.disabled = true;
+            addLog(`🚀 Starting agent with goal: "${goal}"`);
+
+            // Send start signal to Main process
+            ipcRenderer.send('start-agent', { goal, webContentsId: webview.getWebContentsId() });
+        });
+
+        btnStop.addEventListener('click', () => {
+            ipcRenderer.send('stop-agent');
+            addLog('🛑 Stopping agent...');
+        });
+
+        // Listen for logs/status from main process
+        ipcRenderer.on('agent-log', (event, message) => {
+            addLog(message);
+        });
+
+        // Listen for stats
+        ipcRenderer.on('agent-stats', (event, stats) => {
+            document.getElementById('stat-time').textContent = stats.time;
+            document.getElementById('stat-api').textContent = stats.apiCalls;
+            document.getElementById('stat-tokens').textContent = stats.tokens;
+        });
+
+        ipcRenderer.on('agent-stopped', () => {
+            btnStart.disabled = false;
+            btnStop.disabled = true;
+            goalInput.disabled = false;
+            addLog('✅ Agent stopped.');
+        });
+
+    </script>
+</body>
+
+</html>
