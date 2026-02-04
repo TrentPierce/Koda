@@ -1,3 +1,22 @@
+/**
+ * ============================================================================
+ * CONTEXT MANAGER - Session & State Tracking
+ * ============================================================================
+ * 
+ * Tracks the agent's session state, navigation history, and action history.
+ * Used by EnhancedAgent to provide context to the LLM and detect loops.
+ * 
+ * KEY FEATURES:
+ * - Session management (start, end, persistence)
+ * - URL history tracking
+ * - Action history with success/failure tracking
+ * - Loop detection (scroll loops, navigation regression, alternating patterns)
+ * - DOM snapshot storage
+ * - Chat message logging
+ * 
+ * ============================================================================
+ */
+
 const crypto = require('crypto');
 
 class ContextManager {
@@ -242,7 +261,49 @@ class ContextManager {
 
         // Check if the same action is repeated
         const uniqueActions = [...new Set(actionSignatures)];
-        return uniqueActions.length === 1;
+        if (uniqueActions.length === 1) {
+            return { type: 'exact_repeat', action: recent[0].type };
+        }
+
+        // Check for scroll loop specifically (scrolling 3+ times in a row)
+        const recentTypes = recent.map(a => a.type);
+        if (recentTypes.every(t => t === 'scroll' || t === 'scrolling')) {
+            return { type: 'scroll_loop', count: threshold };
+        }
+
+        // Check for alternating pattern (e.g., scroll-click-scroll-click)
+        if (threshold >= 4) {
+            const lastFour = this.actionHistory.slice(-4);
+            const pattern1 = lastFour[0]?.type;
+            const pattern2 = lastFour[1]?.type;
+            if (pattern1 && pattern2 &&
+                lastFour[2]?.type === pattern1 && lastFour[3]?.type === pattern2) {
+                return { type: 'alternating', actions: [pattern1, pattern2] };
+            }
+        }
+
+        // Check for navigation regression (going back to same URL)
+        if (this.urlHistory.length >= 3) {
+            const recentUrls = this.urlHistory.slice(-3);
+            if (recentUrls[0] === recentUrls[2] && recentUrls[0] !== recentUrls[1]) {
+                return { type: 'navigation_regression', url: recentUrls[0] };
+            }
+        }
+
+        return false;
+    }
+
+    // Get count of consecutive scroll actions
+    getConsecutiveScrollCount() {
+        let count = 0;
+        for (let i = this.actionHistory.length - 1; i >= 0; i--) {
+            if (this.actionHistory[i].type === 'scroll' || this.actionHistory[i].type === 'scrolling') {
+                count++;
+            } else {
+                break;
+            }
+        }
+        return count;
     }
 
     getProgress() {

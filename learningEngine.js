@@ -1,3 +1,22 @@
+/**
+ * ============================================================================
+ * LEARNING ENGINE - Pattern Recognition & Strategy Library
+ * ============================================================================
+ * 
+ * Records successful/failed patterns and provides recommendations to the agent.
+ * Learns from past interactions to improve future performance.
+ * 
+ * KEY FEATURES:
+ * - Success/failure pattern recording
+ * - Strategy library (navigation, forms, popups, etc.)
+ * - Domain-specific learning
+ * - Recommendation generation
+ * - Clarifying question generation when stuck
+ * - Alternative action suggestions
+ * 
+ * ============================================================================
+ */
+
 class LearningEngine {
     constructor(database, contextManager) {
         this.db = database;
@@ -32,13 +51,13 @@ class LearningEngine {
 
         const domain = this.contextManager.currentDomain;
         const actionType = this.categorizeAction(action);
-        
+
         // Extract selector pattern
         const selectorPattern = this.extractSelectorPattern(action.selector);
-        
+
         // Extract context keywords from DOM
         const contextKeywords = this.extractContextKeywords(executionDetails.domContext);
-        
+
         // Record pattern
         this.db.recordPattern(
             actionType,
@@ -62,14 +81,14 @@ class LearningEngine {
 
         const domain = this.contextManager.currentDomain;
         const actionType = this.categorizeAction(action);
-        
+
         // Record with lower success rate
         const selectorPattern = this.extractSelectorPattern(action.selector);
         const contextKeywords = this.extractContextKeywords(action.domContext);
-        
+
         // Calculate success rate based on attempt number
         const successRate = Math.max(0, 1.0 - (attemptNumber * 0.3));
-        
+
         this.db.recordPattern(
             actionType,
             domain,
@@ -84,7 +103,7 @@ class LearningEngine {
     // Get learned strategies for current domain
     getStrategiesForCurrentDomain(actionType = null) {
         if (!this.contextManager.currentDomain) return [];
-        
+
         return this.db.getPatternsForDomain(
             this.contextManager.currentDomain,
             actionType,
@@ -98,15 +117,15 @@ class LearningEngine {
 
         const domain = this.contextManager.currentDomain;
         const actionType = this.categorizeAction(action);
-        
+
         // Get learned patterns for this action type
         const patterns = this.db.getPatternsForDomain(domain, actionType, 0.5);
-        
+
         if (patterns.length === 0) return action;
 
         // Modify action based on learned patterns
         let modifiedAction = { ...action };
-        
+
         // On second attempt, try alternative selector strategies
         if (attemptNumber === 2) {
             const alternativeSelector = this.findAlternativeSelector(patterns, action.selector);
@@ -115,7 +134,7 @@ class LearningEngine {
                 modifiedAction._learnedModification = 'alternative_selector';
             }
         }
-        
+
         // On third attempt, try context-based selection
         if (attemptNumber === 3) {
             const contextBasedSelector = this.findContextBasedSelector(patterns, action);
@@ -123,7 +142,7 @@ class LearningEngine {
                 modifiedAction.selector = contextBasedSelector;
                 modifiedAction._learnedModification = 'context_based_selector';
             }
-            
+
             // Also adjust timing
             modifiedAction._delay = 2000; // Add 2 second delay
         }
@@ -134,24 +153,24 @@ class LearningEngine {
     // Categorize action into types
     categorizeAction(action) {
         if (!action || !action.action) return 'unknown';
-        
+
         const actionStr = action.action.toLowerCase();
         const text = (action.text || action.reason || '').toLowerCase();
-        
+
         if (actionStr === 'navigate' || actionStr === 'goto') return 'navigation';
         if (actionStr === 'click' || actionStr === 'press') return 'click_interaction';
         if (actionStr === 'type' || actionStr === 'input' || actionStr === 'fill') return 'form_interaction';
         if (actionStr === 'scroll') return 'scrolling';
         if (text.includes('search') || text.includes('find')) return 'search';
         if (text.includes('submit') || text.includes('login') || text.includes('sign')) return 'form_submission';
-        
+
         return 'general';
     }
 
     // Extract pattern from selector
     extractSelectorPattern(selector) {
         if (!selector) return 'unknown';
-        
+
         // Simplify selector to pattern
         if (selector.includes('data-agent-id')) {
             return '[data-agent-id]';
@@ -171,17 +190,17 @@ class LearningEngine {
         if (selector.includes('a ') || selector.includes('a[')) {
             return 'link';
         }
-        
+
         return selector.split(' ')[0]; // Return first part
     }
 
     // Extract keywords from DOM context
     extractContextKeywords(domContext) {
         if (!domContext) return '';
-        
+
         // Extract important keywords
         const keywords = [];
-        
+
         if (domContext.includes('search')) keywords.push('search');
         if (domContext.includes('form')) keywords.push('form');
         if (domContext.includes('login')) keywords.push('login');
@@ -191,7 +210,7 @@ class LearningEngine {
         if (domContext.includes('popup')) keywords.push('popup');
         if (domContext.includes('cart')) keywords.push('cart');
         if (domContext.includes('checkout')) keywords.push('checkout');
-        
+
         return keywords.join(',');
     }
 
@@ -199,19 +218,19 @@ class LearningEngine {
     findAlternativeSelector(patterns, currentSelector) {
         // Try to find a pattern with better success rate
         const betterPatterns = patterns.filter(p => p.success_rate > 0.7);
-        
+
         if (betterPatterns.length > 0) {
             // Return the selector pattern with highest success
             return betterPatterns[0].selector_pattern;
         }
-        
+
         return null;
     }
 
     // Find context-based selector
     findContextBasedSelector(patterns, action) {
         const actionText = (action.text || action.reason || '').toLowerCase();
-        
+
         // Match context keywords
         for (const pattern of patterns) {
             if (pattern.context_keywords) {
@@ -223,22 +242,22 @@ class LearningEngine {
                 }
             }
         }
-        
+
         return null;
     }
 
     // Get recommendations for current state
     getRecommendations() {
         if (!this.contextManager.currentDomain) return [];
-        
+
         const domain = this.contextManager.currentDomain;
         const recentActions = this.contextManager.actionHistory.slice(-5);
-        
+
         const recommendations = [];
-        
+
         // Check for common patterns on this domain
         const topPatterns = this.db.getPatternsForDomain(domain, null, 0.8);
-        
+
         if (topPatterns.length > 0) {
             recommendations.push({
                 type: 'learned_pattern',
@@ -276,7 +295,7 @@ class LearningEngine {
         if (!domain) return null;
 
         const stats = this.db.getDomainLearningStats(domain);
-        
+
         return {
             domain: domain,
             totalPatterns: stats.total_patterns || 0,
@@ -288,9 +307,9 @@ class LearningEngine {
 
     calculateEffectiveness(stats) {
         if (!stats.total_patterns || stats.total_patterns === 0) return 'learning';
-        
+
         const avgRate = stats.avg_success_rate || 0;
-        
+
         if (avgRate > 0.8) return 'excellent';
         if (avgRate > 0.6) return 'good';
         if (avgRate > 0.4) return 'fair';
@@ -301,51 +320,105 @@ class LearningEngine {
     generateClarifyingQuestion(action, error, context) {
         const actionType = this.categorizeAction(action);
         const recentActions = this.contextManager.actionHistory.slice(-3);
-        
+        const domain = this.contextManager.currentDomain || 'this site';
+        const currentUrl = context?.currentUrl || 'current page';
+
         let question = '';
         let options = [];
-        
-        if (actionType === 'click_interaction') {
-            question = `I'm having trouble clicking on the element. ${error || 'It may not be visible or clickable.'}`;
+        let severity = 'medium';
+
+        // Extract useful details from the action
+        const selectorInfo = action?.selector ? ` (selector: ${action.selector})` : '';
+        const actionReason = action?.reason ? ` Reason: "${action.reason}"` : '';
+
+        // Check for specific failure patterns
+        const failureCount = recentActions.filter(a => a.success === false).length;
+        const isRepeatedFailure = failureCount >= 2;
+
+        if (this.contextManager.detectLoop()) {
+            // LOOP DETECTION - highest priority
+            severity = 'high';
+            question = `🔄 **Loop Detected on ${domain}**\n\nI've attempted the same action ${failureCount + 1} times without progress.${actionReason}`;
             options = [
-                'Try a different element',
-                'Scroll down first',
-                'Wait for the page to load more',
-                'Skip this step'
+                '1️⃣ Skip this step and continue',
+                '2️⃣ Try a completely different approach',
+                '3️⃣ Scroll down to reveal more options',
+                '4️⃣ Go back to previous page',
+                '5️⃣ Give me specific instructions'
             ];
+        } else if (actionType === 'click_interaction') {
+            const elementDesc = selectorInfo || 'the target element';
+            question = `🖱️ **Click Failed on ${domain}**\n\nUnable to click ${elementDesc}.\n${error ? `Error: ${error}` : 'The element may be hidden, disabled, or covered by another element.'}`;
+            options = [
+                '1️⃣ Try clicking a different element',
+                '2️⃣ Scroll down first to reveal it',
+                '3️⃣ Wait longer for page to load',
+                '4️⃣ Skip this step'
+            ];
+            severity = isRepeatedFailure ? 'high' : 'medium';
+
         } else if (actionType === 'form_interaction') {
-            question = `I'm having trouble with the form input. ${error || 'The field might have special requirements.'}`;
+            question = `⌨️ **Form Input Failed on ${domain}**\n\nUnable to enter text${selectorInfo}.\n${error ? `Error: ${error}` : 'The field may require specific formatting or have validation rules.'}`;
             options = [
-                'Try typing the text differently',
-                'Clear the field first',
-                'Look for a different input field',
-                'Skip this field'
+                '1️⃣ Clear the field and try again',
+                '2️⃣ Try a different input format',
+                '3️⃣ Look for a different input field',
+                '4️⃣ Skip this field'
             ];
-        } else if (recentActions.length > 0 && this.contextManager.detectLoop()) {
-            question = 'I seem to be stuck in a loop. What would you like me to do?';
+            severity = 'medium';
+
+        } else if (actionType === 'navigation') {
+            question = `🌐 **Navigation Issue on ${domain}**\n\nUnable to navigate to the target page.\n${error ? `Error: ${error}` : 'The URL may be incorrect or the site may be blocking access.'}`;
             options = [
-                'Try a completely different approach',
-                'Go back to the previous page',
-                'Start over with the task',
-                'Ask for more specific instructions'
+                '1️⃣ Try a different URL',
+                '2️⃣ Search for the page instead',
+                '3️⃣ Refresh and try again',
+                '4️⃣ Skip this navigation'
             ];
+            severity = 'high';
+
+        } else if (error && error.toLowerCase().includes('timeout')) {
+            question = `⏱️ **Timeout on ${domain}**\n\nThe action took too long to complete.\n${actionReason}`;
+            options = [
+                '1️⃣ Wait longer and retry',
+                '2️⃣ Refresh the page',
+                '3️⃣ Try a different approach',
+                '4️⃣ Skip this step'
+            ];
+            severity = 'medium';
+
+        } else if (error && (error.toLowerCase().includes('captcha') || error.toLowerCase().includes('verify'))) {
+            question = `🤖 **Human Verification Required on ${domain}**\n\nThe site is asking for CAPTCHA or human verification.`;
+            options = [
+                '1️⃣ Please complete the verification manually',
+                '2️⃣ Try to proceed without verification',
+                '3️⃣ Abort this task'
+            ];
+            severity = 'high';
+
         } else {
-            question = `I'm having difficulty: ${error || 'The page might have changed or requires special handling.'}`;
+            question = `⚠️ **Action Failed on ${domain}**\n\n${error || 'An unexpected issue occurred.'}\n${actionReason}`;
             options = [
-                'Try again',
-                'Try a different approach',
-                'Wait and try again',
-                'Skip this step'
+                '1️⃣ Retry the action',
+                '2️⃣ Try a different approach',
+                '3️⃣ Wait and try again',
+                '4️⃣ Skip this step',
+                '5️⃣ Provide specific guidance'
             ];
+            severity = isRepeatedFailure ? 'high' : 'low';
         }
-        
+
         return {
             question,
             options,
+            severity,
             context: {
                 action: action,
+                actionType: actionType,
                 recentFailures: this.contextManager.getRecentFailures(3),
-                domain: this.contextManager.currentDomain
+                domain: domain,
+                currentUrl: currentUrl,
+                failureCount: failureCount
             }
         };
     }
@@ -356,18 +429,18 @@ class LearningEngine {
 
         const domain = this.contextManager.currentDomain;
         const actionType = this.categorizeAction(action);
-        
+
         // Extract what user corrected
         if (userFeedback.toLowerCase().includes('click') && userFeedback.toLowerCase().includes('instead')) {
             // User suggested a different element to click
             this.db.setPreference(domain, 'click_strategy', 'user_corrected', 0.95);
         }
-        
+
         if (userFeedback.toLowerCase().includes('wait') || userFeedback.toLowerCase().includes('slow')) {
             // User wants slower execution
             this.db.setPreference(domain, 'timing', 'slower', 0.9);
         }
-        
+
         if (userFeedback.toLowerCase().includes('scroll')) {
             // User wants scrolling
             this.db.setPreference(domain, 'scroll_first', 'true', 0.85);
@@ -376,7 +449,7 @@ class LearningEngine {
         // Record this as a high-confidence pattern
         const selectorPattern = this.extractSelectorPattern(action.selector);
         const contextKeywords = this.extractContextKeywords(userFeedback);
-        
+
         this.db.recordPattern(
             actionType,
             domain,
@@ -395,7 +468,7 @@ class LearningEngine {
             ORDER BY use_count DESC 
             LIMIT 20
         `).all();
-        
+
         // Group by pattern type
         const patternsByType = {};
         for (const pattern of allPatterns) {
@@ -404,7 +477,7 @@ class LearningEngine {
             }
             patternsByType[pattern.pattern_type].push(pattern);
         }
-        
+
         // Return most universal patterns
         const tips = [];
         for (const [type, patterns] of Object.entries(patternsByType)) {
@@ -417,14 +490,14 @@ class LearningEngine {
                 });
             }
         }
-        
+
         return tips;
     }
 
     // Export learned data for backup/analysis
     exportLearnedData() {
         const domain = this.contextManager.currentDomain;
-        
+
         return {
             domain: domain,
             patterns: this.db.getPatternsForDomain(domain),

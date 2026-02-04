@@ -1,3 +1,42 @@
+/**
+ * ============================================================================
+ * ENHANCED AGENT - PRODUCTION CLASS
+ * ============================================================================
+ * 
+ * This is the MAIN agent class used in production. It extends the base Agent
+ * class (agent.js) to add intelligent features.
+ * 
+ * THIS FILE HANDLES:
+ * ------------------
+ * - Production LLM prompt (askGeminiEnhanced) - THE MAIN PROMPT
+ * - Decoy detection & avoidance in prompts
+ * - Popup handling priority
+ * - Navigation regression prevention
+ * - Code/secret discovery guidance
+ * - Context & session tracking
+ * - Loop/scroll detection
+ * - Learning engine integration
+ * - Retry logic with error recovery
+ * - User interaction & chat
+ * 
+ * INHERITS FROM agent.js:
+ * -----------------------
+ * - DOM extraction (getSimplifiedDOM) - detects decoys, filler text, hidden codes
+ * - Action execution (executeAction) - click, type, scroll, navigate
+ * - Screenshot capture
+ * - Basic logging
+ * 
+ * WHEN MAKING CHANGES:
+ * --------------------
+ * - LLM prompt improvements        → Edit askGeminiEnhanced() in THIS file
+ * - Loop/stuck detection           → Edit loop() in THIS file
+ * - Learning/context features      → Edit THIS file
+ * - DOM extraction improvements    → Edit getSimplifiedDOM() in agent.js
+ * - Action execution improvements  → Edit executeAction() in agent.js
+ * 
+ * ============================================================================
+ */
+
 const Agent = require('./agent');
 
 class EnhancedAgent extends Agent {
@@ -81,10 +120,23 @@ class EnhancedAgent extends Agent {
         }
 
         try {
-            // Check for loops
-            if (this.contextManager.detectLoop(3)) {
-                this.log("⚠️ Loop detected! Pausing for user guidance.");
-                this.handleStuckState('loop_detected');
+            // Check for loops with enhanced detection
+            const loopInfo = this.contextManager.detectLoop(3);
+            if (loopInfo) {
+                if (loopInfo.type === 'scroll_loop') {
+                    this.log(`⚠️ Scroll loop detected (${loopInfo.count} scrolls)! Trying alternative action.`);
+                    // Instead of pausing, try a click action
+                    this.handleStuckState('scroll_loop', 'Scrolled multiple times without finding target element');
+                } else if (loopInfo.type === 'navigation_regression') {
+                    this.log(`⚠️ Navigation regression to ${loopInfo.url}! Pausing.`);
+                    this.handleStuckState('navigation_regression', `Keep navigating back to ${loopInfo.url}`);
+                } else if (loopInfo.type === 'alternating') {
+                    this.log(`⚠️ Alternating loop detected (${loopInfo.actions.join(' ↔ ')})! Pausing.`);
+                    this.handleStuckState('alternating_loop', `Stuck alternating between ${loopInfo.actions.join(' and ')}`);
+                } else {
+                    this.log(`⚠️ Loop detected (${loopInfo.type})! Pausing for user guidance.`);
+                    this.handleStuckState('loop_detected');
+                }
                 return;
             }
 
@@ -106,6 +158,43 @@ class EnhancedAgent extends Agent {
             // Update context
             this.contextManager.recordNavigation(currentUrl);
             this.contextManager.saveDomState(simplifiedDOM);
+
+            // ================================================================
+            // POPUP PRE-CHECK: Auto-handle popups before consulting Gemini
+            // Returns an array of actions to close ALL detected popups at once
+            // ================================================================
+            const popupActions = this.detectAndHandlePopups(simplifiedDOM);
+            if (popupActions && popupActions.length > 0) {
+                this.log(`🚨 ${popupActions.length} popup(s) detected! Auto-closing...`);
+
+                // Execute ALL popup close actions in sequence (no API calls)
+                for (const popupAction of popupActions) {
+                    if (!this.active) return;
+
+                    this.log(`  → Closing: ${popupAction.reason}`);
+                    this.currentAction = popupAction;
+
+                    const success = await this.executeWithRetry(popupAction);
+
+                    if (success) {
+                        this.contextManager.logAction(popupAction.action, {
+                            selector: popupAction.selector,
+                            autoHandled: true
+                        }, true);
+
+                        // Brief pause between popup closes
+                        await this.sleep(500);
+                    } else {
+                        this.log(`  ⚠️ Failed to close: ${popupAction.selector}`);
+                    }
+                }
+
+                // Wait for popups to fully close, then continue loop
+                await this.sleep(800);
+                if (this.active) this.loop();
+                return;
+            }
+            // ================================================================
 
             // Get context for Gemini
             const context = this.contextManager.getCurrentContext();
@@ -141,7 +230,7 @@ class EnhancedAgent extends Agent {
         }
     }
 
-    async executeWithRetry(actionPlan, context) {
+    async executeWithRetry(actionPlan, context = {}) {
         const executionTime = Date.now() - this.actionStartTime;
 
         for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
@@ -172,7 +261,7 @@ class EnhancedAgent extends Agent {
                     modifiedPlan.action,
                     modifiedPlan,
                     {
-                        domState: context.domState,
+                        domState: context?.domState,
                         geminiPrompt: this.lastPrompt,
                         geminiResponse: JSON.stringify(modifiedPlan),
                         success: true,
@@ -183,7 +272,7 @@ class EnhancedAgent extends Agent {
 
                 // Record success for learning
                 await this.learningEngine.recordSuccess(modifiedPlan, {
-                    domContext: context.domState,
+                    domContext: context?.domState,
                     executionTime: execTime
                 });
 
@@ -216,7 +305,7 @@ class EnhancedAgent extends Agent {
                     actionPlan.action,
                     actionPlan,
                     {
-                        domState: context.domState,
+                        domState: context?.domState,
                         success: false,
                         errorMessage: error.message,
                         retryCount: attempt
@@ -236,43 +325,299 @@ class EnhancedAgent extends Agent {
         }
     }
 
+    /**
+     * Detects ALL popups/modals in the DOM and returns actions to close them.
+     * This runs BEFORE consulting Gemini to ensure popups are handled immediately.
+     * Returns an array so multiple popups can be closed in one pass (batch operation).
+     * 
+     * AGGRESSIVE MODE: Looks for close buttons even without explicit popup flags.
+     * 
+     * @param {string} dom - The simplified DOM string
+     * @returns {Array} - Array of action plans to close all detected popups
+     */
+    detectAndHandlePopups(dom) {
+        // Check for popup indicators in DOM (flags from getSimplifiedDOM)
+        const hasPopupFlag = dom.includes('[IN-POPUP]');
+        const hasCookieBanner = dom.includes('[COOKIE-BANNER]');
+        const hasNewsletter = dom.includes('[NEWSLETTER]');
+
+        // ALSO check for common popup keywords in the DOM text
+        const domLower = dom.toLowerCase();
+        const hasPopupKeywords = (
+            domLower.includes('cookie') ||
+            domLower.includes('consent') ||
+            domLower.includes('privacy') ||
+            domLower.includes('newsletter') ||
+            domLower.includes('subscribe') ||
+            domLower.includes('modal') ||
+            domLower.includes('popup') ||
+            domLower.includes('overlay') ||
+            domLower.includes('accept all') ||
+            domLower.includes('dismiss') ||
+            domLower.includes('got it') ||
+            domLower.includes('no thanks')
+        );
+
+        const hasAnyPopupIndicator = hasPopupFlag || hasCookieBanner || hasNewsletter || hasPopupKeywords;
+
+        if (!hasAnyPopupIndicator) {
+            return []; // No popup indicators at all
+        }
+
+        this.log(`[PopupCheck] Flags: popup=${hasPopupFlag}, cookie=${hasCookieBanner}, newsletter=${hasNewsletter}, keywords=${hasPopupKeywords}`);
+
+        // Parse DOM to find safe close buttons
+        // Match elements with their IDs and text content
+        const elementRegex = /<(\w+)[^>]*id="(\d+)"[^>]*>([^<]*)<\/\w+>/gi;
+        const elements = [];
+        let match;
+
+        while ((match = elementRegex.exec(dom)) !== null) {
+            elements.push({
+                tag: match[1],
+                id: match[2],
+                text: match[3].trim(),
+                fullMatch: match[0]
+            });
+        }
+
+        // Priority list of safe close button patterns (NOT decoys)
+        const safeClosePatterns = [
+            // Cookie banners - prefer accept buttons
+            { pattern: /^accept(\s+all)?$/i, priority: 1, type: 'cookie' },
+            { pattern: /^(i\s+)?accept$/i, priority: 1, type: 'cookie' },
+            { pattern: /^(got\s+it|okay?|ok)$/i, priority: 2, type: 'cookie' },
+            { pattern: /^agree(\s+&\s+continue)?$/i, priority: 2, type: 'cookie' },
+            { pattern: /^allow(\s+all)?(\s+cookies)?$/i, priority: 2, type: 'cookie' },
+
+            // Newsletter/modals - prefer dismiss buttons
+            { pattern: /^(no,?\s*)?(thanks|thank you)$/i, priority: 1, type: 'newsletter' },
+            { pattern: /^(maybe\s+)?later$/i, priority: 1, type: 'newsletter' },
+            { pattern: /^not\s+now$/i, priority: 1, type: 'newsletter' },
+            { pattern: /^skip$/i, priority: 2, type: 'newsletter' },
+
+            // Generic close buttons
+            { pattern: /^(close|dismiss|cancel)$/i, priority: 3, type: 'generic' },
+            { pattern: /^[×✕✖xX]$/i, priority: 3, type: 'generic' },
+        ];
+
+        // Find ALL matching close buttons (NOT marked as decoy)
+        // Collect all matches, will deduplicate by keeping best priority
+        const allMatches = []; // { priority, action }
+
+        for (const el of elements) {
+            // Skip elements marked as decoys or suspicious
+            if (el.fullMatch.includes('[DECOY]') || el.fullMatch.includes('[SUSPICIOUS')) {
+                this.log(`[PopupCheck] Skipping decoy: id=${el.id} "${el.text}"`);
+                continue;
+            }
+
+            // Skip disabled elements
+            if (el.fullMatch.includes('[DISABLED]')) {
+                continue;
+            }
+
+            // Determine which popup type this element belongs to
+            let elementPopupType = null;
+            if (el.fullMatch.includes('[COOKIE-BANNER]')) {
+                elementPopupType = 'cookie';
+            } else if (el.fullMatch.includes('[NEWSLETTER]')) {
+                elementPopupType = 'newsletter';
+            } else if (el.fullMatch.includes('[IN-POPUP]')) {
+                elementPopupType = 'popup';
+            }
+
+            for (const closePattern of safeClosePatterns) {
+                if (closePattern.pattern.test(el.text)) {
+                    // Calculate effective priority (lower is better)
+                    let effectivePriority = closePattern.priority;
+
+                    // Boost priority if element is actually in a popup
+                    if (elementPopupType) {
+                        effectivePriority -= 0.5;
+                    }
+
+                    // Prefer buttons over other elements
+                    if (el.tag.toLowerCase() === 'button') {
+                        effectivePriority -= 0.3;
+                    }
+
+                    // Use element's popup type, or pattern's type as fallback
+                    const actionType = elementPopupType || closePattern.type;
+
+                    this.log(`[PopupCheck] Found close button: id=${el.id} "${el.text}" type=${actionType} priority=${effectivePriority.toFixed(1)}`);
+
+                    allMatches.push({
+                        priority: effectivePriority,
+                        elementId: el.id,
+                        action: {
+                            action: 'click',
+                            selector: `[data-agent-id='${el.id}']`,
+                            reason: `Closing ${actionType}: '${el.text}'`,
+                            autoHandled: true,
+                            popupType: actionType
+                        }
+                    });
+                    break; // Move to next element once a pattern matches
+                }
+            }
+        }
+
+        if (allMatches.length === 0) {
+            this.log(`[PopupCheck] No matching close buttons found`);
+            return [];
+        }
+
+        // Sort by priority and return all actions (limit to 5 to prevent infinite loops)
+        const sortedActions = allMatches
+            .sort((a, b) => a.priority - b.priority)
+            .slice(0, 5)
+            .map(item => item.action);
+
+        this.log(`[PopupCheck] Returning ${sortedActions.length} popup close actions`);
+        return sortedActions;
+    }
+
     async askGeminiEnhanced(goal, dom, base64Image, context) {
         this.apiCalls++;
         this.sendStats();
 
-        // Build compact context summary (not full history)
+        // Build compact context summary
         let contextStr = '';
+        let historyStr = '';
+
         if (context.recentActions && context.recentActions.length > 0) {
             const actionSummary = context.recentActions.slice(-5).map((a, idx) => {
                 const status = a.success === true ? '✓' : a.success === false ? '✗' : '?';
                 return `${status}${a.type}`;
             }).join(', ');
-            contextStr = `\nRecent: ${actionSummary}`;
+            historyStr = `\nRecent Actions: ${actionSummary}`;
         }
 
         // Add learned recommendations (limit to 2)
         const recommendations = this.learningEngine.getRecommendations().slice(0, 2);
         if (recommendations.length > 0) {
-            contextStr += '\nTips: ' + recommendations.map(r => r.message).join('; ');
+            contextStr = '\nLearned Tips: ' + recommendations.map(r => r.message).join('; ');
         }
 
-        // Compact prompt format
-        this.lastPrompt = `You are a browser automation agent.
+        // Add scroll count warning
+        const scrollCount = this.contextManager.getConsecutiveScrollCount();
+        if (scrollCount >= 2) {
+            contextStr += `\n⚠️ WARNING: Scrolled ${scrollCount}x in a row. Try clicking an element instead of scrolling again.`;
+        }
 
-Goal: "${goal}"
-URL: ${context.currentUrl || 'unknown'}
-${contextStr}
+        // Extract element count and detect special flags
+        const elementCount = (dom.match(/data-agent-id/g) || []).length;
+        const hasDecoys = dom.includes('[DECOY]') || dom.includes('[SUSPICIOUS');
+        const hasPopups = dom.includes('[IN-POPUP]') || dom.includes('[COOKIE-BANNER]') || dom.includes('[NEWSLETTER]');
+        const hasCodes = dom.includes('=== DETECTED CODES/SECRETS ===');
 
-Elements (id=data-agent-id):
+        // Detect if we're on a step-based challenge
+        const stepMatch = context.currentUrl?.match(/step(\d+)/i);
+        const currentStep = stepMatch ? stepMatch[1] : null;
+
+        // Enterprise-grade prompt with decoy detection and popup handling
+        this.lastPrompt = `You are a precise browser automation agent specializing in navigating complex pages with popups, decoys, and multi-step challenges.
+
+## GOAL
+"${goal}"
+
+## CURRENT STATE
+- URL: ${context.currentUrl || 'unknown'}
+- Elements: ${elementCount}${currentStep ? ` | Step: ${currentStep}` : ''}${hasPopups ? ' | ⚠️ POPUPS DETECTED' : ''}${hasDecoys ? ' | ⚠️ DECOYS DETECTED' : ''}${hasCodes ? ' | 🔑 CODES FOUND' : ''}${historyStr}${contextStr}
+
+## AVAILABLE ELEMENTS (DOM)
+Elements are tagged with metadata flags. PAY ATTENTION TO THESE FLAGS:
+- \`[DECOY]\` = FAKE button that won't work - DO NOT CLICK
+- \`[SUSPICIOUS-TEXT]\` = Scam/spam content - AVOID
+- \`[IN-POPUP]\` = Inside a popup/modal overlay
+- \`[COOKIE-BANNER]\` = Cookie consent element
+- \`[NEWSLETTER]\` = Newsletter/subscription popup
+- \`[DISABLED]\` = Element is disabled - cannot interact
+
+\`\`\`
 ${dom}
+\`\`\`
 
-Rules:
-1. For sites like "reddit", use "navigate" directly to https://www.reddit.com
-2. For "click", selector must be: [data-agent-id='ID']
-3. For "ask", include a question for the user
-4. If stuck, use "scroll" or "ask"
+## CRITICAL RULES
 
-Choose ONE action to achieve the goal.`;
+### 1. DECOY DETECTION (HIGHEST PRIORITY)
+- NEVER click elements marked \`[DECOY]\` or \`[SUSPICIOUS-*]\`
+- If a button says "Close" but is marked \`[DECOY]\`, find the REAL close button
+- Look for alternative dismiss options: "Dismiss", "No thanks", "Maybe later", "X", "✕"
+- Decoys often have siblings that are the real buttons - check nearby elements
+
+### 2. POPUP HANDLING PRIORITY
+**Order of operations when popups exist:**
+1. Look for LEGITIMATE close buttons (NOT marked as decoy)
+2. Check for "Accept", "Dismiss", "No thanks", "Continue" buttons
+3. Click outside overlay if possible (but this may not work)
+4. Scroll within popup if content is hidden
+5. If truly stuck, use "ask" action
+
+**Safe popup dismissal options (prefer these):**
+- Cookie banners: "Accept", "Accept All", "OK", "Got it"
+- Newsletters: "No thanks", "Maybe later", "Close", "X"
+- Alerts: "Dismiss", "Close", "OK", "Continue"
+
+### 3. NAVIGATION RULES
+- ❌ NEVER navigate back to the start URL if you're already making progress (e.g., on /step1, /step2)
+- ❌ NEVER re-navigate to the same domain you're already on
+- ✅ Only use "navigate" when going to a completely NEW site
+- Check the URL before navigating - if it contains the target domain, you're already there
+
+### 4. CODE/SECRET DISCOVERY
+- If "DETECTED CODES/SECRETS" section exists, USE those codes for any input fields
+- Codes marked \`[HIDDEN]\` or \`[COMMENT]\` are intentionally hidden - use them!
+- Don't guess codes from URLs - use codes found in the DOM
+
+### 5. PROGRESS TRACKING (for step-based challenges)
+- Note which step you're on (Step 1, Step 2, etc.)
+- Complete each step fully before moving to the next
+- If stuck on a step, scroll to find hidden navigation buttons
+- After 3+ scrolls without progress, try clicking visible navigation elements
+
+### 6. ACTION REFERENCE
+| Action | Use Case | Required Fields |
+|--------|----------|----------------|
+| navigate | Go to NEW site only | url, reason |
+| click | Click element (must exist, NOT decoy) | selector, reason |
+| type | Enter text (use detected codes!) | selector, text, reason |
+| scroll | Reveal hidden content | reason |
+| wait | Page loading | reason |
+| done | Goal FULLY complete | reason |
+| ask | Need user help | question, reason |
+
+### 7. SELECTOR FORMAT
+Always: \`[data-agent-id='X']\` where X is the exact ID from DOM.
+
+## FAILURE MODES TO AVOID
+❌ Clicking \`[DECOY]\` or \`[SUSPICIOUS-*]\` elements
+❌ Navigating when already on the correct domain
+❌ Guessing codes instead of using detected codes
+❌ Clicking the same failed element repeatedly
+❌ Scrolling infinitely without trying clicks
+❌ Marking "done" before goal is verifiably complete
+
+## OUTPUT FORMAT
+JSON only. No markdown, no explanation.
+{"action": "<action>", "selector": "[data-agent-id='X']", "text": "<if typing>", "url": "<if navigating>", "question": "<if asking>", "reason": "<why>"}
+
+## EXAMPLES
+
+✓ Dismiss popup (safe button, not decoy):
+{"action": "click", "selector": "[data-agent-id='47']", "reason": "Clicking 'Accept' to dismiss cookie banner - not marked as decoy"}
+
+✓ Avoid decoy, use real button:
+{"action": "click", "selector": "[data-agent-id='52']", "reason": "Clicking real 'Continue' button - id='51' is marked [DECOY]"}
+
+✓ Use discovered code:
+{"action": "type", "selector": "[data-agent-id='34']", "text": "SECRETCODE123", "reason": "Using code from DETECTED CODES section"}
+
+✓ Already on site - don't re-navigate:
+{"action": "scroll", "reason": "Already on target site, scrolling to find next step button"}
+
+## YOUR RESPONSE (JSON only):`;
 
         const imagePart = {
             inlineData: {
@@ -355,6 +700,13 @@ Choose ONE action to achieve the goal.`;
                 // Check for done
                 if (/done|goal achieved|finished/i.test(cleanText)) {
                     return { action: "done", reason: "Parsed from text" };
+                }
+
+                // Check for ask command (model wants to ask user something)
+                const askMatch = cleanText.match(/ask\s+["']?(.+?)["']?$/i);
+                if (askMatch) {
+                    this.log('✅ Ask: ' + askMatch[1].substring(0, 50));
+                    return { action: "ask", question: askMatch[1], reason: "Model needs clarification" };
                 }
 
                 this.log("❌ All parsing failed: " + jsonError.message);

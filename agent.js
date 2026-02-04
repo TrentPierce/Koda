@@ -1,3 +1,42 @@
+/**
+ * ============================================================================
+ * BROWSER AGENT - BASE CLASS
+ * ============================================================================
+ * 
+ * ARCHITECTURE OVERVIEW:
+ * ----------------------
+ * This file contains the BASE Agent class with core browser automation logic.
+ * EnhancedAgent (enhancedAgent.js) EXTENDS this class and is used in production.
+ * 
+ * FILE RESPONSIBILITIES:
+ * ----------------------
+ * agent.js (this file):
+ *   - DOM extraction & element detection (getSimplifiedDOM)
+ *   - Decoy/fake element flagging
+ *   - Filler text filtering
+ *   - Hidden code/secret discovery
+ *   - Action execution (click, type, scroll, navigate)
+ *   - Base Gemini prompt (fallback only, not used in production)
+ * 
+ * enhancedAgent.js:
+ *   - Production LLM prompt (askGeminiEnhanced) 
+ *   - Context & session tracking
+ *   - Loop/scroll detection
+ *   - Learning engine integration
+ *   - Retry logic with error recovery
+ *   - User interaction & chat
+ * 
+ * WHEN MAKING CHANGES:
+ * --------------------
+ * - DOM extraction improvements    → Edit getSimplifiedDOM() in THIS file
+ * - Action execution improvements  → Edit executeAction() in THIS file
+ * - LLM prompt improvements        → Edit askGeminiEnhanced() in enhancedAgent.js
+ * - Loop/stuck detection           → Edit loop() in enhancedAgent.js
+ * - Learning/context features      → Edit enhancedAgent.js
+ * 
+ * ============================================================================
+ */
+
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 console.log('[Agent] *** AGENT.JS VERSION 2.0 LOADED ***');
 
@@ -173,16 +212,117 @@ class Agent {
     }
 
     async getSimplifiedDOM() {
-        // Script to tag elements and extract minimal info with token optimization
+        // Enhanced script to tag elements, detect decoys, and extract hidden information
         const counterStart = this.agentIdCounter;
         const script = `
         (function() {
-            const MAX_ELEMENTS = 30; // Limit DOM size for token efficiency
-            const elements = document.querySelectorAll('a, button, input, textarea, select, [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="option"], [onclick], label, h1, h2, h3, h4, .modal, .popup, [aria-label*="close" i], [class*="close" i]');
+            const MAX_ELEMENTS = 50; // Increased for complex pages with popups
+            const elements = document.querySelectorAll('a, button, input, textarea, select, [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="option"], [onclick], label, h1, h2, h3, h4, p, span, .modal, .popup, .overlay, .dialog, [aria-label*="close" i], [class*="close" i], [class*="dismiss" i], [class*="accept" i]');
             const lines = [];
             const seenText = new Set();
             let counter = ${counterStart};
             
+            // DECOY/FAKE DETECTION PATTERNS
+            const suspiciousPatterns = {
+                classNames: /fake|decoy|trick|trap|honey|spam|ad-|advert|promo|clickbait/i,
+                textPatterns: /\\bfake\\b|\\bdecoy\\b|\\btrick\\b|\\btrap\\b|you('ve)? won|congratulations|claim.*(prize|reward)|urgent|act now|limited time/i,
+                dataAttrs: /fake|decoy|trap|honey/i
+            };
+            
+            // Helper to detect suspicious elements
+            const isSuspicious = (el) => {
+                const className = el.className || '';
+                const text = (el.innerText || '').toLowerCase();
+                const dataAttrs = Array.from(el.attributes).map(a => a.name + '=' + a.value).join(' ');
+                
+                // Check parent context for "(Fake)" or similar labels
+                const parentText = el.parentElement?.innerText || '';
+                if (/\\(fake\\)|\\(decoy\\)|fake button|decoy button/i.test(parentText)) return 'DECOY';
+                
+                // Check element's own attributes and text
+                if (suspiciousPatterns.classNames.test(className)) return 'SUSPICIOUS-CLASS';
+                if (suspiciousPatterns.textPatterns.test(text)) return 'SUSPICIOUS-TEXT';
+                if (suspiciousPatterns.dataAttrs.test(dataAttrs)) return 'SUSPICIOUS-ATTR';
+                
+                return null;
+            };
+            
+            // Helper to detect if element is part of a popup/modal
+            const getPopupContext = (el) => {
+                let parent = el.parentElement;
+                let depth = 0;
+                while (parent && depth < 10) {
+                    const cls = (parent.className || '').toLowerCase();
+                    const role = parent.getAttribute('role') || '';
+                    if (cls.includes('modal') || cls.includes('popup') || cls.includes('overlay') || 
+                        cls.includes('dialog') || role === 'dialog' || role === 'alertdialog') {
+                        return '[IN-POPUP]';
+                    }
+                    if (cls.includes('cookie') || cls.includes('consent') || cls.includes('gdpr')) {
+                        return '[COOKIE-BANNER]';
+                    }
+                    if (cls.includes('newsletter') || cls.includes('subscribe')) {
+                        return '[NEWSLETTER]';
+                    }
+                    parent = parent.parentElement;
+                    depth++;
+                }
+                return '';
+            };
+            
+            // EXTRACT HIDDEN CODES/SECRETS from the page
+            const extractSecrets = () => {
+                const secrets = [];
+                // Look for code patterns in text content
+                const allText = document.body.innerText || '';
+                
+                // Common code patterns: "code: ABC123", "Code is: XYZ", "secret: 12345", etc.
+                const codePatterns = [
+                    /code[:\\s]+["']?([A-Za-z0-9]{4,12})["']?/gi,
+                    /secret[:\\s]+["']?([A-Za-z0-9]{4,12})["']?/gi,
+                    /password[:\\s]+["']?([A-Za-z0-9!@#$%]{4,20})["']?/gi,
+                    /key[:\\s]+["']?([A-Za-z0-9]{4,12})["']?/gi,
+                    /enter[:\\s]+["']?([A-Za-z0-9]{4,12})["']?/gi,
+                    /the code is[:\\s]+["']?([A-Za-z0-9]{4,12})["']?/gi
+                ];
+                
+                for (const pattern of codePatterns) {
+                    let match;
+                    while ((match = pattern.exec(allText)) !== null) {
+                        if (match[1] && !secrets.includes(match[1])) {
+                            secrets.push(match[1]);
+                        }
+                    }
+                }
+                
+                // Check for hidden elements with codes
+                const hiddenEls = document.querySelectorAll('[style*="display:none"], [style*="visibility:hidden"], [hidden], .hidden, .sr-only, .visually-hidden');
+                hiddenEls.forEach(el => {
+                    const text = el.innerText || el.textContent || '';
+                    if (text.length > 2 && text.length < 50) {
+                        const codeMatch = text.match(/[A-Za-z0-9]{4,12}/);
+                        if (codeMatch && !secrets.includes(codeMatch[0])) {
+                            secrets.push('[HIDDEN] ' + codeMatch[0]);
+                        }
+                    }
+                });
+                
+                // Check HTML comments for hidden info
+                const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
+                while (walker.nextNode()) {
+                    const comment = walker.currentNode.nodeValue;
+                    if (comment && comment.length > 3 && comment.length < 100) {
+                        const codeMatch = comment.match(/code[:\\s]*([A-Za-z0-9]{4,12})|secret[:\\s]*([A-Za-z0-9]{4,12})/i);
+                        if (codeMatch) {
+                            secrets.push('[COMMENT] ' + (codeMatch[1] || codeMatch[2]));
+                        }
+                    }
+                }
+                
+                return secrets;
+            };
+            
+            // Main element extraction
             for (const el of elements) {
                 if (lines.length >= MAX_ELEMENTS) break;
                 
@@ -191,33 +331,95 @@ class Agent {
                 if (rect.width < 5 || rect.height < 5) continue;
                 if (rect.bottom < 0 || rect.top > window.innerHeight) continue;
                 
-                // Skip if fully obscured
+                // Skip if fully obscured (but still check visibility more carefully)
                 const style = window.getComputedStyle(el);
-                if (style.visibility === 'hidden' || style.opacity === '0' || style.display === 'none') continue;
+                if (style.visibility === 'hidden' || style.display === 'none') continue;
+                // Allow low opacity elements as they might be overlays we need to dismiss
+                const opacity = parseFloat(style.opacity);
+                if (opacity < 0.1) continue;
 
                 // Get text context
                 let text = el.innerText || el.value || el.getAttribute('aria-label') || el.title || el.placeholder || "";
-                text = text.replace(/\\s+/g, ' ').trim().substring(0, 60);
+                text = text.replace(/\\s+/g, ' ').trim().substring(0, 80);
+                
+                // FILLER TEXT DETECTION - Skip placeholder/useless content
+                const textLower = text.toLowerCase();
+                const isFillerText = (
+                    // Lorem ipsum and Latin placeholders
+                    /lorem\\s*ipsum|dolor\\s*sit\\s*amet|consectetur\\s*adipiscing|sed\\s*do\\s*eiusmod|tempor\\s*incididunt|ut\\s*labore\\s*et|magna\\s*aliqua|enim\\s*ad\\s*minim|quis\\s*nostrud|exercitation\\s*ullamco|laboris\\s*nisi|aliquip\\s*ex\\s*ea|commodo\\s*consequat|duis\\s*aute\\s*irure|voluptate\\s*velit|esse\\s*cillum/i.test(textLower) ||
+                    
+                    // Common placeholder patterns
+                    /^(placeholder|sample|example|test|demo|dummy|filler|default)\\s*(text|content|data|title|description)?$/i.test(textLower) ||
+                    /^\\[.*\\]$/.test(text) || // [Placeholder], [Title], etc.
+                    /^\\{.*\\}$/.test(text) || // {placeholder}
+                    /^<.*>$/.test(text) ||   // <placeholder>
+                    
+                    // Generic filler phrases
+                    /^(click here|read more|learn more|view more|see more|show more|load more)$/i.test(textLower) ||
+                    /^(untitled|no title|title goes here|heading|subheading|paragraph)$/i.test(textLower) ||
+                    /^(your (text|content|title|name|email) here)$/i.test(textLower) ||
+                    /^(insert|add|enter|type) (text|content|title|name) here$/i.test(textLower) ||
+                    /^(coming soon|under construction|work in progress|tbd|n\\/a|none|null|undefined)$/i.test(textLower) ||
+                    
+                    // Repeated characters or patterns (e.g., "aaaaa", "xxxxx", "-----")
+                    /^(.)(\\1{4,})$/.test(text) ||
+                    /^[-=_.]{5,}$/.test(text) ||
+                    
+                    // Generic marketing filler
+                    /^(best|great|amazing|awesome|incredible|fantastic) (product|service|offer|deal)s?$/i.test(textLower) ||
+                    
+                    // Empty or whitespace-only after normalization
+                    textLower.length === 0 ||
+                    /^\\s*$/.test(text)
+                );
+                
+                // Skip filler text unless it's an interactive element
+                const isInteractive = ['button', 'input', 'select', 'textarea', 'a'].includes(el.tagName.toLowerCase()) ||
+                                     el.getAttribute('role') === 'button' ||
+                                     el.hasAttribute('onclick');
+                
+                if (isFillerText && !isInteractive) continue;
                 
                 // Skip duplicate text to reduce tokens
-                if (text && seenText.has(text.toLowerCase())) continue;
-                if (text) seenText.add(text.toLowerCase());
+                const textKey = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (textKey.length > 3 && seenText.has(textKey)) continue;
+                if (textKey.length > 3) seenText.add(textKey);
 
-                // Assign incremental ID (more reliable than random)
+
+                // Assign incremental ID
                 if (!el.hasAttribute('data-agent-id')) {
                     el.setAttribute('data-agent-id', (++counter).toString());
                 }
                 const agentId = el.getAttribute('data-agent-id');
                 
+                // Detect suspicious/decoy elements
+                const suspiciousFlag = isSuspicious(el);
+                const popupContext = getPopupContext(el);
+                
                 const tag = el.tagName.toLowerCase();
                 const type = el.type ? \`type="\${el.type}"\` : "";
                 const role = el.getAttribute('role') ? \`role="\${el.getAttribute('role')}"\` : "";
                 const checked = el.checked ? 'CHECKED' : '';
+                const disabled = el.disabled ? '[DISABLED]' : '';
                 
-                // Compact format to reduce tokens
-                if (text || tag === 'input' || tag === 'select' || tag === 'textarea' || role) {
-                    lines.push(\`<\${tag} \${type} \${role} \${checked} id="\${agentId}">\${text}</\${tag}>\`);
+                // Build flags string
+                let flags = '';
+                if (suspiciousFlag) flags += \`[\${suspiciousFlag}]\`;
+                if (popupContext) flags += popupContext;
+                if (disabled) flags += disabled;
+                
+                // Compact format with flags
+                if (text || tag === 'input' || tag === 'select' || tag === 'textarea' || role || flags) {
+                    lines.push(\`<\${tag} \${type} \${role} \${checked} id="\${agentId}">\${flags}\${text}</\${tag}>\`);
                 }
+            }
+            
+            // Add extracted secrets section if any found
+            const secrets = extractSecrets();
+            if (secrets.length > 0) {
+                lines.push('');
+                lines.push('=== DETECTED CODES/SECRETS ===');
+                secrets.slice(0, 5).forEach(s => lines.push('CODE: ' + s));
             }
             
             window._agentIdCounter = counter;
@@ -237,37 +439,90 @@ class Agent {
         return result;
     }
 
+    /**
+     * Base Gemini prompt method.
+     * NOTE: This method is ONLY used if Agent is instantiated directly.
+     * In production, EnhancedAgent.askGeminiEnhanced() is used instead,
+     * which has additional context awareness, decoy detection, and learning integration.
+     * 
+     * The DOM extraction (getSimplifiedDOM) and action execution (executeAction) 
+     * methods ARE shared between both classes.
+     */
     async askGemini(goal, dom, base64Image) {
         this.apiCalls++;
         this.sendStats();
 
-        // Prompt with strict JSON output requirement
-        const prompt = `You are a browser automation agent. Analyze the screenshot and HTML to decide the next action.
+        // Enterprise-grade prompt with strict guardrails
+        const prompt = `You are a precise browser automation agent. Your task is to achieve a goal by analyzing a screenshot and a list of interactive elements, then outputting exactly ONE action as valid JSON.
 
-Goal: "${goal}"
+## GOAL
+"${goal}"
 
-Interactive elements (use id as data-agent-id selector):
+## AVAILABLE INTERACTIVE ELEMENTS (DOM)
+These are the ONLY elements you can interact with. Each has a unique data-agent-id.
+\`\`\`
 ${dom}
+\`\`\`
 
-RULES:
-1. For websites like "reddit", "amazon" - use "navigate" action with full URL (https://www.reddit.com)
-2. For "click" - use selector: [data-agent-id='ID'] where ID is from the HTML above
-3. For "type" - provide both selector and text
-4. If element not found, use "scroll" or "wait"
+## CRITICAL RULES
 
-ACTIONS: navigate, click, type, scroll, wait, done, ask
+### 1. GROUNDING REQUIREMENT (MANDATORY)
+- You can ONLY reference element IDs that appear in the DOM list above.
+- If the element you need is NOT in the list, you MUST use "scroll" or "wait" to reveal it.
+- NEVER invent or guess element IDs. If you reference an ID not in the DOM, the action will fail.
 
-YOU MUST RESPOND WITH ONLY A VALID JSON OBJECT. No explanation, no markdown, no text before or after.
+### 2. ACTION SELECTION
+| Action | When to Use | Required Fields |
+|--------|-------------|----------------|
+| navigate | Go to a specific URL (only if not already there) | url, reason |
+| click | Click a visible, interactive element | selector, reason |
+| type | Enter text into an input/textarea | selector, text, reason |
+| scroll | Reveal more content (element not visible) | reason |
+| wait | Page is loading or dynamic content expected | reason |
+| done | Goal has been FULLY achieved | reason |
+| ask | Need user input (credentials, choices, etc.) | question, reason |
 
-JSON Schema:
-{"action": "click|type|scroll|done|navigate|wait|ask", "selector": "[data-agent-id='X']", "text": "text if typing", "url": "url if navigating", "reason": "brief explanation"}
+### 3. SELECTOR FORMAT
+- Always use: \`[data-agent-id='X']\` where X is the exact ID from the DOM list.
+- Example: \`[data-agent-id='5']\` NOT \`[data-agent-id=5]\` or \`#5\`
 
-Example responses:
-{"action": "navigate", "url": "https://www.reddit.com", "reason": "Going to Reddit as requested"}
-{"action": "click", "selector": "[data-agent-id='5']", "reason": "Clicking sign up button"}
-{"action": "type", "selector": "[data-agent-id='12']", "text": "username123", "reason": "Entering username"}
+### 4. EDGE CASE HANDLING
+- **Popups/Modals/Cookie banners**: Look for close buttons (X, "Close", "Accept", "Dismiss") and click them FIRST before proceeding.
+- **Login walls**: If login is required but not part of the goal, use "ask" to get credentials.
+- **CAPTCHAs**: Use "ask" action to request user intervention.
+- **Multiple similar elements**: Choose the most contextually relevant one based on surrounding text.
+- **Empty DOM list**: Page may still be loading - use "wait" action.
 
-Respond with JSON only:`;
+### 5. COMMON MISTAKES TO AVOID
+✗ Do NOT click elements that don't exist in the DOM list
+✗ Do NOT navigate if you're already on the correct page
+✗ Do NOT type into non-input elements
+✗ Do NOT mark "done" until the goal is verifiably complete
+✗ Do NOT output anything except the JSON object
+
+## OUTPUT FORMAT
+Respond with ONLY a valid JSON object. No markdown, no explanation, no text before or after.
+
+{"action": "<action>", "selector": "[data-agent-id='X']", "text": "<if typing>", "url": "<if navigating>", "question": "<if asking>", "reason": "<brief explanation>"}
+
+## EXAMPLES
+
+✓ Correct - Navigation:
+{"action": "navigate", "url": "https://www.reddit.com", "reason": "Navigating to Reddit as requested"}
+
+✓ Correct - Click (ID exists in DOM):
+{"action": "click", "selector": "[data-agent-id='7']", "reason": "Clicking the Sign Up button"}
+
+✓ Correct - Type into input:
+{"action": "type", "selector": "[data-agent-id='12']", "text": "john@example.com", "reason": "Entering email address"}
+
+✓ Correct - Element not visible:
+{"action": "scroll", "reason": "The submit button is not visible, scrolling to reveal more content"}
+
+✓ Correct - Need user input:
+{"action": "ask", "question": "What username would you like me to use for registration?", "reason": "Need user-provided username"}
+
+## YOUR RESPONSE (JSON only):`;
 
         const imagePart = {
             inlineData: {
