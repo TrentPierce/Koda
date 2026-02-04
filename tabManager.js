@@ -19,7 +19,7 @@ class TabManager {
         this.tabBar = document.createElement('div');
         this.tabBar.id = 'tab-bar';
         this.tabBar.className = 'tab-bar';
-        
+
         // Create new tab button
         const newTabBtn = document.createElement('button');
         newTabBtn.className = 'new-tab-btn';
@@ -28,14 +28,14 @@ class TabManager {
         newTabBtn.addEventListener('click', () => {
             this.createTab('https://www.google.com');
         });
-        
+
         // Create tabs container
         this.tabsContainer = document.createElement('div');
         this.tabsContainer.className = 'tabs-container';
-        
+
         this.tabBar.appendChild(this.tabsContainer);
         this.tabBar.appendChild(newTabBtn);
-        
+
         // Insert after nav bar
         const navBar = document.getElementById('nav-bar');
         navBar.parentNode.insertBefore(this.tabBar, navBar.nextSibling);
@@ -45,40 +45,45 @@ class TabManager {
         this.webviewContainer = document.createElement('div');
         this.webviewContainer.id = 'webview-container';
         this.webviewContainer.className = 'webview-container';
-        
-        // Replace existing webview
+
+        // Replace existing webview or append to main-view
         const oldWebview = document.getElementById('browser-view');
         if (oldWebview) {
             oldWebview.parentNode.replaceChild(this.webviewContainer, oldWebview);
+        } else {
+            const mainView = document.getElementById('main-view');
+            if (mainView) {
+                mainView.appendChild(this.webviewContainer);
+            }
         }
     }
 
     createTab(url = 'https://www.google.com') {
         const tabId = `tab-${this.nextTabId++}`;
-        
+
         // Create webview
         const webview = document.createElement('webview');
         webview.id = `webview-${tabId}`;
         webview.className = 'browser-webview';
         webview.src = url;
-        webview.setAttribute('nodeintegration', 'true');
+        webview.setAttribute('allowpopups', 'true');
         webview.style.width = '100%';
         webview.style.height = '100%';
         webview.style.display = 'none';
-        
+
         // Create tab element
         const tab = document.createElement('div');
         tab.className = 'tab';
         tab.dataset.tabId = tabId;
-        
+
         // Tab content (title + close button)
         const tabContent = document.createElement('div');
         tabContent.className = 'tab-content';
-        
+
         const tabTitle = document.createElement('span');
         tabTitle.className = 'tab-title';
         tabTitle.textContent = 'Loading...';
-        
+
         const closeBtn = document.createElement('span');
         closeBtn.className = 'tab-close';
         closeBtn.innerHTML = '×';
@@ -86,20 +91,20 @@ class TabManager {
             e.stopPropagation();
             this.closeTab(tabId);
         });
-        
+
         tabContent.appendChild(tabTitle);
         tabContent.appendChild(closeBtn);
         tab.appendChild(tabContent);
-        
+
         // Tab click event
         tab.addEventListener('click', () => {
             this.switchToTab(tabId);
         });
-        
+
         // Add to containers
         this.tabsContainer.appendChild(tab);
         this.webviewContainer.appendChild(webview);
-        
+
         // Store tab data
         this.tabs.set(tabId, {
             id: tabId,
@@ -110,33 +115,33 @@ class TabManager {
             agent: null,
             isActive: false
         });
-        
+
         // Set up webview events
         this.setupWebviewEvents(tabId, webview);
-        
+
         // Switch to new tab
         this.switchToTab(tabId);
-        
+
         return tabId;
     }
 
     setupWebviewEvents(tabId, webview) {
         const tabData = this.tabs.get(tabId);
-        
+
         webview.addEventListener('did-navigate', (e) => {
             if (tabData.isActive) {
                 this.updateUrlBar(e.url);
             }
             tabData.url = e.url;
         });
-        
+
         webview.addEventListener('did-navigate-in-page', (e) => {
             if (tabData.isActive) {
                 this.updateUrlBar(e.url);
             }
             tabData.url = e.url;
         });
-        
+
         webview.addEventListener('page-title-updated', (e) => {
             tabData.title = e.title || 'New Tab';
             const titleEl = tabData.tabElement.querySelector('.tab-title');
@@ -145,7 +150,7 @@ class TabManager {
             }
             tabData.tabElement.title = tabData.title;
         });
-        
+
         webview.addEventListener('page-favicon-updated', (e) => {
             // Could update favicon here
         });
@@ -153,7 +158,7 @@ class TabManager {
 
     switchToTab(tabId) {
         if (this.activeTabId === tabId) return;
-        
+
         // Deactivate current tab
         if (this.activeTabId) {
             const currentTab = this.tabs.get(this.activeTabId);
@@ -163,7 +168,7 @@ class TabManager {
                 currentTab.webview.style.display = 'none';
             }
         }
-        
+
         // Activate new tab
         const newTab = this.tabs.get(tabId);
         if (newTab) {
@@ -172,7 +177,7 @@ class TabManager {
             newTab.webview.style.display = 'block';
             this.activeTabId = tabId;
             this.updateUrlBar(newTab.url);
-            
+
             // Notify main process of tab switch
             if (window.ipcRenderer) {
                 window.ipcRenderer.send('tab-switched', tabId);
@@ -183,19 +188,19 @@ class TabManager {
     closeTab(tabId) {
         const tab = this.tabs.get(tabId);
         if (!tab) return;
-        
+
         // Stop agent if running
         if (window.ipcRenderer) {
             window.ipcRenderer.send('stop-agent', tabId);
         }
-        
+
         // Remove elements
         tab.tabElement.remove();
         tab.webview.remove();
-        
+
         // Remove from map
         this.tabs.delete(tabId);
-        
+
         // Switch to another tab if this was active
         if (this.activeTabId === tabId) {
             const remainingTabs = Array.from(this.tabs.keys());

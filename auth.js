@@ -27,35 +27,38 @@ class AuthManager {
         }
 
         try {
-            // Derive key and store password hash
-            const derivedKey = this.deriveKey(password);
-            const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-            
             // Store in system keychain
-            await keytar.setPassword(SERVICE_NAME, ACCOUNT_NAME, passwordHash);
-            
-            this.derivedKey = derivedKey;
+            await keytar.setPassword(SERVICE_NAME, ACCOUNT_NAME, password);
+
+            this.derivedKey = this.deriveKey(password);
             this.isAuthenticated = true;
-            
+
             console.log('[Auth] Password set successfully');
-            return { success: true, derivedKey };
+            return { success: true, derivedKey: this.derivedKey };
         } catch (error) {
             console.error('[Auth] Error setting password:', error.message);
             throw error;
         }
     }
 
+    async getStoredPassword() {
+        try {
+            return await keytar.getPassword(SERVICE_NAME, ACCOUNT_NAME);
+        } catch (error) {
+            console.error('[Auth] Error getting stored password:', error.message);
+            return null;
+        }
+    }
+
     async verifyPassword(password) {
         try {
-            const storedHash = await keytar.getPassword(SERVICE_NAME, ACCOUNT_NAME);
-            
-            if (!storedHash) {
+            const storedPassword = await keytar.getPassword(SERVICE_NAME, ACCOUNT_NAME);
+
+            if (!storedPassword) {
                 return { success: false, error: 'No password set' };
             }
 
-            const inputHash = crypto.createHash('sha256').update(password).digest('hex');
-            
-            if (inputHash === storedHash) {
+            if (password === storedPassword) {
                 this.derivedKey = this.deriveKey(password);
                 this.isAuthenticated = true;
                 console.log('[Auth] Password verified successfully');

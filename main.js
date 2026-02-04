@@ -43,21 +43,43 @@ async function initializeApp() {
             return;
         }
     } else {
-        // Returning user - prompt for password
-        const password = await promptForPassword();
+        // Returning user - try auto-login first
+        let password = await authManager.getStoredPassword();
+        let result = null;
+
+        if (password) {
+            result = await authManager.verifyPassword(password);
+            // If verification fails (e.g. stored value was a hash from old version), clear and prompt
+            if (!result.success) {
+                password = null;
+            }
+        }
+
         if (!password) {
+            password = await promptForPassword();
+            if (!password) {
+                app.quit();
+                return;
+            }
+            result = await authManager.verifyPassword(password);
+            if (!result.success) {
+                dialog.showErrorBox('Authentication Failed', 'Invalid password. Please try again.');
+                app.quit();
+                return;
+            }
+        }
+
+        // Initialize database with verified password
+        try {
+            await initializeDatabase(password);
+        } catch (error) {
+            console.error('[Main] Database initialization failed:', error);
+            // If database fails with stored password, it might be corrupted or key mismatch
+            // In a real app, we might want to prompt again or reset, but for now we error.
+            dialog.showErrorBox('Database Error', 'Could not open secure database. Your password might have changed.');
             app.quit();
             return;
         }
-
-        const result = await authManager.verifyPassword(password);
-        if (!result.success) {
-            dialog.showErrorBox('Authentication Failed', 'Invalid password. Please try again.');
-            app.quit();
-            return;
-        }
-
-        await initializeDatabase(password);
     }
 
     isAuthenticated = true;

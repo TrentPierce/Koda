@@ -29,12 +29,14 @@
             height: 100vh;
             display: flex;
             overflow: hidden;
+            width: 100%;
         }
 
-        /* Left Panel - Command Center */
+        /* Layout */
         #sidebar {
-            width: 30%;
-            min-width: 350px;
+            width: 350px;
+            min-width: 250px;
+            max-width: 600px;
             background-color: var(--sidebar-bg);
             border-right: 1px solid var(--border-color);
             display: flex;
@@ -42,6 +44,32 @@
             padding: 20px;
             box-sizing: border-box;
             z-index: 100;
+            height: 100%;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        #resizer {
+            width: 4px;
+            cursor: col-resize;
+            background-color: transparent;
+            transition: background-color 0.2s;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        #resizer:hover,
+        #resizer.active {
+            background-color: var(--accent-color);
+        }
+
+        #main-view {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            position: relative;
+            min-width: 0;
         }
 
         h1 {
@@ -182,21 +210,69 @@
 
         #logs {
             flex-grow: 1;
-            background-color: #000;
+            background-color: #0d0d16;
             border-radius: 8px;
             padding: 10px;
             font-family: 'Fira Code', monospace;
             font-size: 0.8rem;
             overflow-y: auto;
             border: 1px solid var(--border-color);
-            color: #a6e3a1;
+            color: #cdd6f4;
             scroll-behavior: smooth;
         }
 
         .log-entry {
-            margin-bottom: 4px;
-            border-bottom: 1px solid #222;
-            padding-bottom: 2px;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #1e1e2e;
+            word-wrap: break-word;
+        }
+
+        .log-entry.user {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .log-entry.agent {
+            color: var(--success-color);
+        }
+
+        .log-entry.system {
+            color: #6c7086;
+            font-style: italic;
+        }
+
+        .chat-input-sidebar {
+            margin-top: 15px;
+            display: flex;
+            gap: 8px;
+            background-color: var(--input-bg);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-input-sidebar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            outline: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .chat-input-sidebar button {
+            flex: none;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            background-color: var(--accent-color);
+            color: #111;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .log-timestamp {
@@ -205,13 +281,7 @@
         }
 
         /* Right Panel - Browser View */
-        #main-view {
-            width: 70%;
-            display: flex;
-            flex-direction: column;
-            background-color: #fff;
-            position: relative;
-        }
+        /* Moved to body layout classes above */
 
         #nav-bar {
             height: 50px;
@@ -361,18 +431,18 @@
 
         /* Webview Container */
         .webview-container {
-            flex-grow: 1;
+            flex: 1;
             position: relative;
             background: #fff;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .browser-webview {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             border: none;
+            display: block;
         }
 
         /* Question Dialog Overlay */
@@ -515,7 +585,7 @@
             <button id="btn-stop" disabled>Stop</button>
         </div>
 
-        <div style="height: 20px;"></div>
+        <div style="height: 15px;"></div>
 
         <div id="stats-container">
             <div class="stat-item">
@@ -534,22 +604,27 @@
                 <span>📊 Success Rate:</span>
                 <span id="stat-success" class="stat-value">-</span>
             </div>
-            <div class="stat-item">
-                <span>🧠 Learning:</span>
-                <span id="stat-learning" class="learning-indicator" style="display: none;">ACTIVE</span>
-            </div>
         </div>
 
         <div id="logs-container">
             <div id="logs-header">
-                <span>Activity Log</span>
+                <span>Agent Interaction</span>
                 <button class="logs-toggle" id="btn-toggle-logs">Compact</button>
             </div>
             <div id="logs">
-                <div class="log-entry"><span class="log-timestamp">[System]</span> Multi-tab browser ready. Create tabs and start agents!</div>
+                <div class="log-entry system"><span class="log-timestamp">[System]</span> Ready. Enter a goal or chat
+                    below.</div>
+            </div>
+
+            <div class="chat-input-sidebar">
+                <input type="text" id="sidebar-chat-input" placeholder="Ask or command the agent...">
+                <button id="btn-sidebar-send">➤</button>
             </div>
         </div>
     </div>
+
+    <!-- Resizer handle -->
+    <div id="resizer"></div>
 
     <!-- Right Panel -->
     <div id="main-view">
@@ -558,7 +633,7 @@
             <button id="btn-go">Go</button>
         </div>
         <!-- Tabs and webviews will be inserted here by TabManager -->
-        
+
         <!-- Question Dialog Overlay -->
         <div id="question-overlay">
             <div class="question-dialog">
@@ -573,7 +648,6 @@
         </div>
     </div>
 
-    <script src="chatOverlay.js"></script>
     <script src="tabManager.js"></script>
     <script>
         const { ipcRenderer } = require('electron');
@@ -590,9 +664,38 @@
         const logsDiv = document.getElementById('logs');
         const btnToggleLogs = document.getElementById('btn-toggle-logs');
         const currentTabDisplay = document.getElementById('current-tab-id');
+        const sidebarChatInput = document.getElementById('sidebar-chat-input');
+        const btnSidebarSend = document.getElementById('btn-sidebar-send');
+        const resizer = document.getElementById('resizer');
+        const sidebar = document.getElementById('sidebar');
 
-        // Initialize chat overlay
-        let chatOverlay = null;
+        // --- Resizer Logic ---
+        let isResizing = false;
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            resizer.classList.add('active');
+            document.body.style.cursor = 'col-resize';
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', stopResize);
+        });
+
+        function handleMouseMove(e) {
+            if (!isResizing) return;
+            const width = e.clientX;
+            if (width >= 250 && width <= 600) {
+                sidebar.style.width = width + 'px';
+            }
+        }
+
+        function stopResize() {
+            if (!isResizing) return;
+            isResizing = false;
+            resizer.classList.remove('active');
+            document.body.style.cursor = 'default';
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
 
         // --- Navigation Logic ---
         const navigate = () => {
@@ -607,12 +710,18 @@
         // --- Agent Logic ---
 
         // Log Helper
-        const addLog = (msg, tabId = null) => {
+        const addLog = (msg, tabId = null, type = 'system') => {
             const time = new Date().toLocaleTimeString();
             const div = document.createElement('div');
-            div.className = 'log-entry';
+            div.className = `log-entry ${type}`;
             const tabPrefix = tabId ? `[${tabId}] ` : '';
-            div.innerHTML = `<span class="log-timestamp">[${time}]</span> ${tabPrefix}${msg}`;
+
+            // Handle different message types
+            let content = msg;
+            if (type === 'user') content = `👤 User: ${msg}`;
+            else if (type === 'agent') content = `🤖 Agent: ${msg}`;
+
+            div.innerHTML = `<span class="log-timestamp">[${time}]</span> ${tabPrefix}${content}`;
             logsDiv.appendChild(div);
             requestAnimationFrame(() => {
                 logsDiv.scrollTop = logsDiv.scrollHeight;
@@ -635,19 +744,14 @@
             btnStart.disabled = true;
             btnStop.disabled = false;
             goalInput.disabled = true;
-            
-            addLog(`🚀 Starting agent on ${activeTab.id} with goal: "${goal}"`, activeTab.id);
 
-            // Initialize chat overlay if not already done
-            if (!chatOverlay) {
-                chatOverlay = new ChatOverlay();
-            }
+            addLog(`🚀 Starting agent on ${activeTab.id} with goal: "${goal}"`, activeTab.id, 'system');
 
             // Send start signal to Main process
-            ipcRenderer.send('start-agent', { 
-                goal, 
+            ipcRenderer.send('start-agent', {
+                goal,
                 tabId: activeTab.id,
-                webContentsId: activeTab.webview.getWebContentsId() 
+                webContentsId: activeTab.webview.getWebContentsId()
             });
         });
 
@@ -655,8 +759,38 @@
             const activeTab = tabManager.getActiveTab();
             if (activeTab) {
                 ipcRenderer.send('stop-agent', activeTab.id);
-                addLog('🛑 Stopping agent...', activeTab.id);
+                addLog('🛑 Stopping agent...', activeTab.id, 'system');
             }
+        });
+
+        // --- Sidebar Chat Logic ---
+        const sendSidebarMessage = () => {
+            const message = sidebarChatInput.value.trim();
+            if (!message) return;
+
+            const activeTab = tabManager.getActiveTab();
+            if (!activeTab) {
+                addLog('⚠️ No active tab to chat with.', null, 'system');
+                return;
+            }
+
+            // If agent is not running, typing a message starts it with that goal
+            if (!btnStart.disabled) {
+                addLog(message, null, 'user');
+                goalInput.value = message;
+                btnStart.click();
+            } else {
+                // Agent is running, send message as response/guidance
+                addLog(message, activeTab.id, 'user');
+                ipcRenderer.send('chat-user-message', { message: message, tabId: activeTab.id });
+            }
+
+            sidebarChatInput.value = '';
+        };
+
+        btnSidebarSend.addEventListener('click', sendSidebarMessage);
+        sidebarChatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendSidebarMessage();
         });
 
         // Toggle logs compact mode
@@ -665,9 +799,8 @@
             btnToggleLogs.textContent = logsDiv.classList.contains('compact') ? 'Expanded' : 'Compact';
         });
 
-        // Listen for logs/status from main process
         ipcRenderer.on('agent-log', (event, message, tabId) => {
-            addLog(message, tabId);
+            addLog(message, tabId, 'agent');
         });
 
         // Listen for stats
@@ -675,15 +808,13 @@
             document.getElementById('stat-time').textContent = stats.time;
             document.getElementById('stat-api').textContent = stats.apiCalls;
             document.getElementById('stat-tokens').textContent = stats.tokens;
-            
+
             if (stats.successRate !== undefined) {
                 const successRate = Math.round((stats.successRate || 0) * 100);
                 document.getElementById('stat-success').textContent = successRate + '%';
             }
-            
-            if (stats.learning) {
-                document.getElementById('stat-learning').style.display = 'inline';
-            }
+
+            // Learning indicator can be added back if needed in the UI
         });
 
         ipcRenderer.on('agent-stopped', (event, tabId) => {
@@ -693,7 +824,7 @@
                 btnStop.disabled = true;
                 goalInput.disabled = false;
             }
-            addLog('✅ Agent stopped.', tabId);
+            addLog('✅ Agent stopped.', tabId, 'system');
         });
 
         // Handle agent questions
@@ -707,8 +838,8 @@
         // Handle chat messages
         ipcRenderer.on('chat-message', (event, messageData, tabId) => {
             const activeTab = tabManager.getActiveTab();
-            if (chatOverlay && activeTab && activeTab.id === tabId) {
-                chatOverlay.addMessage(messageData.sender, messageData.message, messageData.type);
+            if (activeTab && activeTab.id === tabId) {
+                addLog(messageData.message, tabId, messageData.sender === 'user' ? 'user' : 'agent');
             }
         });
 
@@ -733,7 +864,7 @@
             currentQuestionTabId = tabId;
             questionText.textContent = questionData.question;
             questionOptions.innerHTML = '';
-            
+
             if (questionData.options && questionData.options.length > 0) {
                 questionData.options.forEach((option, index) => {
                     const btn = document.createElement('button');
@@ -745,7 +876,7 @@
                     questionOptions.appendChild(btn);
                 });
             }
-            
+
             questionOverlay.classList.add('active');
             customAnswerInput.value = '';
             customAnswerInput.focus();
@@ -759,10 +890,7 @@
         function sendQuestionResponse(response, tabId) {
             hideQuestionDialog();
             ipcRenderer.send('chat-user-message', { message: response, tabId });
-            
-            if (chatOverlay) {
-                chatOverlay.addMessage('user', response);
-            }
+            addLog(response, tabId, 'user');
         }
 
         btnCustomAnswer.addEventListener('click', () => {
