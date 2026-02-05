@@ -17,12 +17,9 @@ describe('Basic Integration', () => {
           require('../../src/index');
           return true;
         } catch (error) {
-          // Only fail if it's not an optional dependency issue
           if (!error.message.includes('opencv') && 
               !error.message.includes('better-sqlite3') && 
-              !error.message.includes('keytar') &&
-              !error.message.includes('puppeteer') &&
-              !error.message.includes('sharp')) {
+              !error.message.includes('keytar')) {
             throw error;
           }
           return true;
