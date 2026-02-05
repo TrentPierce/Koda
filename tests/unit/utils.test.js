@@ -14,7 +14,11 @@ describe('Utility Functions', () => {
       const start = Date.now();
       await new Promise(resolve => setTimeout(resolve, 100));
       const duration = Date.now() - start;
+<<<<<<< HEAD
       expect(duration).toBeGreaterThanOrEqual(90);
+=======
+      expect(duration).toBeGreaterThanOrEqual(90); // Allow some margin
+>>>>>>> fix/ci-workflow-failures
     });
   });
 

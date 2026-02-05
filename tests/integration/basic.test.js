@@ -1,5 +1,6 @@
 /**
  * Basic Integration Tests
+<<<<<<< HEAD
  */
 
 describe('Integration Tests', () => {
@@ -13,6 +14,12 @@ describe('Integration Tests', () => {
     expect(major).toBeGreaterThanOrEqual(18);
   });
 
+=======
+ * Tests for basic integration scenarios
+ */
+
+describe('Basic Integration', () => {
+>>>>>>> fix/ci-workflow-failures
   describe('Module Loading', () => {
     test('should load all exported modules without errors', () => {
       expect(() => {
@@ -21,20 +28,35 @@ describe('Integration Tests', () => {
     });
 
     test('optional dependencies should not break module loading', () => {
+<<<<<<< HEAD
+=======
+      // Test that module loads even if optional deps are missing
+>>>>>>> fix/ci-workflow-failures
       const loadModule = () => {
         try {
           require('../../src/index');
           return true;
         } catch (error) {
+<<<<<<< HEAD
           if (!error.message.includes('opencv') &&
             !error.message.includes('better-sqlite3') &&
             !error.message.includes('keytar')) {
+=======
+          // Only fail if it's not an optional dependency issue
+          if (!error.message.includes('opencv') && 
+              !error.message.includes('better-sqlite3') && 
+              !error.message.includes('keytar')) {
+>>>>>>> fix/ci-workflow-failures
             throw error;
           }
           return true;
         }
       };
+<<<<<<< HEAD
 
+=======
+      
+>>>>>>> fix/ci-workflow-failures
       expect(loadModule()).toBe(true);
     });
   });
@@ -43,11 +65,20 @@ describe('Integration Tests', () => {
     test('should handle missing environment variables gracefully', () => {
       const originalEnv = process.env.GEMINI_API_KEY;
       delete process.env.GEMINI_API_KEY;
+<<<<<<< HEAD
 
       expect(() => {
         require('../../src/index');
       }).not.toThrow();
 
+=======
+      
+      expect(() => {
+        // Module should load even without API keys
+        require('../../src/index');
+      }).not.toThrow();
+      
+>>>>>>> fix/ci-workflow-failures
       if (originalEnv) {
         process.env.GEMINI_API_KEY = originalEnv;
       }
