@@ -4,6 +4,7 @@
 
 # Koda 🤖
 ### The Enterprise AI Browser Automation Platform
+![Koda UI](docs/images/koda_ui.png)
 
 [![Tests](https://github.com/TrentPierce/Koda/actions/workflows/ci.yml/badge.svg)](https://github.com/TrentPierce/Koda/actions)
 [![npm version](https://badge.fury.io/js/@trentpierce%2Fkoda.svg)](https://www.npmjs.com/package/@trentpierce/koda)
@@ -12,6 +13,8 @@
 **Koda** is the advanced autonomous agent for the web. It goes beyond simple scrapers by using **Computer Vision** and **Multi-LLM Intelligence** (Gemini, OpenAI, Claude) to understand, interact with, and master any web application, just like a human user.
 
 > **🚀 Enterprise Capabilities**: Self-healing selectors, distributed cloud execution, mobile app automation, and SOC 2 compliant architecture.
+
+> **⚠️ Beta Warning**: Koda is currently in public beta. While powerful, you may encounter bugs or unexpected behavior. Please report any issues on our [GitHub Issues](https://github.com/TrentPierce/Koda/issues) page.
 
 
 ## Table of Contents

@@ -1380,10 +1380,16 @@
                     <img src="docs/images/koda_logo.png" class="logo-icon" alt="Koda Logo">
                     <span class="logo-text">Koda</span>
                 </div>
-                <button class="sidebar-toggle tooltip" id="sidebarToggle" data-tooltip="Toggle sidebar"
-                    aria-label="Toggle sidebar">
-                    ◀
-                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="sidebar-toggle tooltip" id="btnSettings" data-tooltip="Settings"
+                        aria-label="Settings">
+                        ⚙️
+                    </button>
+                    <button class="sidebar-toggle tooltip" id="sidebarToggle" data-tooltip="Toggle sidebar"
+                        aria-label="Toggle sidebar">
+                        ◀
+                    </button>
+                </div>
             </div>
 
             <!-- Mode Switcher -->
@@ -1595,6 +1601,45 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="dialog-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <div class="dialog" style="max-width: 600px;">
+            <div class="dialog-header">
+                <div class="dialog-icon">⚙️</div>
+                <div>
+                    <h2 class="dialog-title" id="settingsTitle">Settings</h2>
+                    <p class="dialog-subtitle">Configure API keys and preferences</p>
+                </div>
+            </div>
+            <div class="dialog-content">
+                <div class="section-label">API Keys</div>
+                <div style="margin-bottom: 20px;">
+                    <label
+                        style="display:block; margin-bottom:8px; font-size:0.875rem; color:var(--text-secondary);">Google
+                        Gemini API Key</label>
+                    <input type="password" class="dialog-input" id="apiKeyGemini"
+                        placeholder="Enter your Gemini API key">
+
+                    <label
+                        style="display:block; margin-bottom:8px; font-size:0.875rem; color:var(--text-secondary);">OpenAI
+                        API Key</label>
+                    <input type="password" class="dialog-input" id="apiKeyOpenAI"
+                        placeholder="Enter your OpenAI API key">
+
+                    <label
+                        style="display:block; margin-bottom:8px; font-size:0.875rem; color:var(--text-secondary);">Anthropic
+                        API Key</label>
+                    <input type="password" class="dialog-input" id="apiKeyAnthropic"
+                        placeholder="Enter your Anthropic API key">
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="btnSettingsCancel">Cancel</button>
+                <button class="btn btn-primary" id="btnSettingsSave">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="tabManager.js"></script>
     <script>
@@ -1621,7 +1666,15 @@
                     urlInput: document.getElementById('urlInput'),
                     dialogOverlay: document.getElementById('dialogOverlay'),
                     welcomeScreen: document.getElementById('welcomeScreen'),
-                    webviewContainer: document.getElementById('webviewContainer')
+                    webviewContainer: document.getElementById('webviewContainer'),
+                    // Settings elements
+                    btnSettings: document.getElementById('btnSettings'),
+                    settingsOverlay: document.getElementById('settingsOverlay'),
+                    btnSettingsSave: document.getElementById('btnSettingsSave'),
+                    btnSettingsCancel: document.getElementById('btnSettingsCancel'),
+                    apiKeyGemini: document.getElementById('apiKeyGemini'),
+                    apiKeyOpenAI: document.getElementById('apiKeyOpenAI'),
+                    apiKeyAnthropic: document.getElementById('apiKeyAnthropic')
                 };
 
                 this.state = {
@@ -1771,8 +1824,44 @@
                 this.elements.urlInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') {
                         this.navigateTo(this.elements.urlInput.value);
+                        this.navigateTo(this.elements.urlInput.value);
                     }
                 });
+
+                // Settings
+                this.elements.btnSettings.addEventListener('click', () => this.showSettings());
+                this.elements.btnSettingsSave.addEventListener('click', () => this.saveSettings());
+                this.elements.btnSettingsCancel.addEventListener('click', () => this.hideSettings());
+            }
+
+            showSettings() {
+                // Request current settings from main process
+                if (window.electronAPI) {
+                    window.electronAPI.getSettings().then(settings => {
+                        this.elements.apiKeyGemini.value = settings.GEMINI_API_KEY || '';
+                        this.elements.apiKeyOpenAI.value = settings.OPENAI_API_KEY || '';
+                        this.elements.apiKeyAnthropic.value = settings.ANTHROPIC_API_KEY || '';
+                    });
+                }
+                this.elements.settingsOverlay.classList.add('active');
+            }
+
+            hideSettings() {
+                this.elements.settingsOverlay.classList.remove('active');
+            }
+
+            saveSettings() {
+                const settings = {
+                    GEMINI_API_KEY: this.elements.apiKeyGemini.value,
+                    OPENAI_API_KEY: this.elements.apiKeyOpenAI.value,
+                    ANTHROPIC_API_KEY: this.elements.apiKeyAnthropic.value
+                };
+
+                if (window.electronAPI) {
+                    window.electronAPI.saveSettings(settings);
+                    this.addLogEntry('system', 'System', 'Settings saved successfully');
+                }
+                this.hideSettings();
             }
 
             clearLogs() {

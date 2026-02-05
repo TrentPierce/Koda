@@ -28,6 +28,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getChatHistory: () => ipcRenderer.invoke('get-chat-history'),
     exportLearningData: () => ipcRenderer.invoke('export-learning-data'),
 
+    // Settings
+    getSettings: () => ipcRenderer.invoke('get-settings'),
+    saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
+
     // Event listeners
     onAgentLog: (callback) => {
         const listener = (event, message) => callback(message);

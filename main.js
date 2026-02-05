@@ -386,6 +386,61 @@ ipcMain.handle('get-chat-history', () => {
     return [];
 });
 
+// Settings Handlers
+ipcMain.handle('get-settings', () => {
+    return {
+        GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+        ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY
+    };
+});
+
+ipcMain.handle('save-settings', async (event, settings) => {
+    try {
+        // Update current process environment
+        if (settings.GEMINI_API_KEY) process.env.GEMINI_API_KEY = settings.GEMINI_API_KEY;
+        if (settings.OPENAI_API_KEY) process.env.OPENAI_API_KEY = settings.OPENAI_API_KEY;
+        if (settings.ANTHROPIC_API_KEY) process.env.ANTHROPIC_API_KEY = settings.ANTHROPIC_API_KEY;
+
+        // Persist to .env file
+        const fs = require('fs');
+        const envPath = path.join(__dirname, '.env');
+        let envContent = '';
+
+        if (fs.existsSync(envPath)) {
+            envContent = fs.readFileSync(envPath, 'utf8');
+        }
+
+        const keysToUpdate = {
+            'GEMINI_API_KEY': settings.GEMINI_API_KEY,
+            'OPENAI_API_KEY': settings.OPENAI_API_KEY,
+            'ANTHROPIC_API_KEY': settings.ANTHROPIC_API_KEY
+        };
+
+        let newContent = envContent;
+
+        for (const [key, value] of Object.entries(keysToUpdate)) {
+            if (value) {
+                const regex = new RegExp(`^${key}=.*`, 'm');
+                if (regex.test(newContent)) {
+                    newContent = newContent.replace(regex, `${key}=${value}`);
+                } else {
+                    newContent += `\n${key}=${value}`;
+                }
+            }
+        }
+
+        // Clean up multiple newlines
+        newContent = newContent.replace(/\n{3,}/g, '\n\n').trim();
+
+        fs.writeFileSync(envPath, newContent);
+        return { success: true };
+    } catch (error) {
+        console.error('[Main] Failed to save settings:', error);
+        return { success: false, error: error.message };
+    }
+});
+
 // Clear data handlers
 ipcMain.on('cleanup-old-data', (event) => {
     if (database) {
