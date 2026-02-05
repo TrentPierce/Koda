@@ -1,0 +1,129 @@
+name: Diagnostic Test
+
+# Simple workflow to test basic CI setup
+# This should work even if main CI has issues
+
+on:
+  push:
+    branches: [ fix/ci-workflow-failures ]
+  workflow_dispatch:
+
+jobs:
+  basic-check:
+    name: Basic Environment Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Environment info
+      run: |
+        echo "=== Environment Information ==="
+        echo "OS: $(uname -s)"
+        echo "Node: $(node --version || echo 'Not installed')"
+        echo "NPM: $(npm --version || echo 'Not installed')"
+        echo "Python: $(python3 --version || echo 'Not installed')"
+        echo "Git: $(git --version)"
+        echo "PWD: $(pwd)"
+        echo "User: $(whoami)"
+        
+    - name: List repository files
+      run: |
+        echo "=== Repository Structure ==="
+        ls -la
+        echo ""
+        echo "=== Package files ==="
+        ls -la package*.json || echo "No package files"
+        echo ""
+        echo "=== Source directory ==="
+        ls -la src/ || echo "No src directory"
+        echo ""
+        echo "=== Tests directory ==="
+        ls -la tests/ || echo "No tests directory"
+        echo ""
+        echo "=== Workflows ==="
+        ls -la .github/workflows/ || echo "No workflows"
+        
+    - name: Check package.json
+      run: |
+        echo "=== Package.json content ==="
+        cat package.json | head -n 30
+        echo ""
+        echo "=== Scripts defined ==="
+        node -e "const pkg = require('./package.json'); console.log(JSON.stringify(pkg.scripts, null, 2))"
+        
+    - name: Setup Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Verify Node and npm
+      run: |
+        echo "=== Node and npm versions ==="
+        node --version
+        npm --version
+        
+    - name: Check package-lock.json
+      run: |
+        if [ -f package-lock.json ]; then
+          echo "✅ package-lock.json exists"
+          wc -l package-lock.json
+        else
+          echo "❌ package-lock.json missing"
+        fi
+        
+    - name: Try npm install (no optional deps)
+      run: |
+        echo "=== Attempting npm ci without optional dependencies ==="
+        npm ci --no-optional
+        echo "✅ npm ci --no-optional succeeded!"
+        
+    - name: List installed packages
+      run: |
+        echo "=== Installed packages ==="
+        npm list --depth=0
+        
+    - name: Check if test script exists
+      run: |
+        echo "=== Checking test command ==="
+        npm run test --help 2>&1 | head -n 5 || echo "Test script defined"
+        
+    - name: Check if lint script exists  
+      run: |
+        echo "=== Checking lint command ==="
+        npm run lint --help 2>&1 | head -n 5 || echo "Lint script defined"
+        
+    - name: Check if build script exists
+      run: |
+        echo "=== Checking build command ==="
+        npm run build --help 2>&1 | head -n 5 || echo "Build script defined"
+        
+    - name: Verify test files exist
+      run: |
+        echo "=== Test files check ==="
+        if [ -d tests ]; then
+          find tests -name "*.test.js" -o -name "*.spec.js"
+          echo "Test files found: $(find tests -name '*.test.js' -o -name '*.spec.js' | wc -l)"
+        else
+          echo "❌ No tests directory"
+        fi
+        
+    - name: Check jsdoc.json
+      run: |
+        if [ -f jsdoc.json ]; then
+          echo "✅ jsdoc.json exists"
+          cat jsdoc.json
+        else
+          echo "❌ jsdoc.json missing (will cause build to fail)"
+        fi
+        
+    - name: Summary
+      run: |
+        echo ""
+        echo "====================================="
+        echo "✅ DIAGNOSTIC TEST COMPLETED"
+        echo "====================================="
+        echo "If you see this, basic setup is working!"
+        echo ""
