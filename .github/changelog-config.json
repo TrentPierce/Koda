@@ -2,35 +2,63 @@
   "categories": [
     {
       "title": "## 🚀 Features",
-      "labels": ["feature", "enhancement", "feat"]
+      "labels": [
+        "feature",
+        "enhancement",
+        "feat"
+      ]
     },
     {
       "title": "## 🐛 Bug Fixes",
-      "labels": ["bug", "fix", "bugfix"]
+      "labels": [
+        "bug",
+        "fix",
+        "bugfix"
+      ]
     },
     {
       "title": "## 📚 Documentation",
-      "labels": ["documentation", "docs"]
+      "labels": [
+        "documentation",
+        "docs"
+      ]
     },
     {
       "title": "## 🔧 Maintenance",
-      "labels": ["chore", "dependencies", "deps"]
+      "labels": [
+        "chore",
+        "maintenance",
+        "refactor",
+        "dependencies",
+        "deps"
+      ]
     },
     {
       "title": "## ⚡ Performance",
-      "labels": ["performance", "perf"]
+      "labels": [
+        "performance",
+        "perf"
+      ]
     },
     {
       "title": "## 🔒 Security",
-      "labels": ["security"]
+      "labels": [
+        "security"
+      ]
     },
     {
       "title": "## 🧪 Testing",
-      "labels": ["test", "testing"]
+      "labels": [
+        "test",
+        "testing"
+      ]
     },
     {
       "title": "## 🎨 Styling",
-      "labels": ["style", "styling"]
+      "labels": [
+        "style",
+        "styling"
+      ]
     }
   ],
   "ignore_labels": [
@@ -41,9 +69,27 @@
     "invalid"
   ],
   "sort": "ASC",
-  "template": "#{{CHANGELOG}}\n\n## Contributors\n\nThank you to all contributors who made this release possible!\n",
+  "template": "#{{CHANGELOG}}\n\n**Full Changelog**: #{{RELEASE_DIFF}}\n\n## Contributors\n\nThank you to all contributors who made this release possible!\n",
   "pr_template": "- #{{TITLE}} (#{{NUMBER}}) by @#{{AUTHOR}}",
-  "empty_template": "- No changes",
+  "empty_template": "- No changes in this release",
   "max_tags_to_fetch": 200,
-  "max_pull_requests": 200
+  "max_pull_requests": 200,
+  "label_extractor": [
+    {
+      "pattern": "^feat(\\(.+\\))?:",
+      "target": "feature"
+    },
+    {
+      "pattern": "^fix(\\(.+\\))?:",
+      "target": "bug"
+    },
+    {
+      "pattern": "^docs(\\(.+\\))?:",
+      "target": "documentation"
+    },
+    {
+      "pattern": "^chore(\\(.+\\))?:",
+      "target": "chore"
+    }
+  ]
 }
