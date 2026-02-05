@@ -42,7 +42,7 @@
 
 ```
 src/index.js
-├─ src/core/BrowserAgentCore.js ✅
+├─ src/core/KodaCore.js ✅
 ├─ src/providers/LLMProviderFactory.js ✅
 ├─ src/providers/GeminiProvider.js ✅
 ├─ src/providers/OpenAIProvider.js ✅

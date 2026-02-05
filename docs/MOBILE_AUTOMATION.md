@@ -1,6 +1,6 @@
 # Mobile Automation Guide
 
-Comprehensive guide for using BrowserAgent's mobile automation capabilities with iOS and Android.
+Comprehensive guide for using Koda's mobile automation capabilities with iOS and Android.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ Comprehensive guide for using BrowserAgent's mobile automation capabilities with
 
 ## Overview
 
-BrowserAgent now supports mobile automation for both iOS and Android platforms through Appium integration. The system provides:
+Koda now supports mobile automation for both iOS and Android platforms through Appium integration. The system provides:
 
 - Unified API for both iOS and Android
 - Platform-agnostic selectors that automatically adapt
@@ -153,7 +153,7 @@ const config = {
 
 ## Platform-Agnostic Selectors
 
-BrowserAgent automatically converts selectors to platform-specific formats:
+Koda automatically converts selectors to platform-specific formats:
 
 ### Selector Types
 

@@ -1,12 +1,12 @@
-# 🚀 Quick Start Guide - BrowserAgent
+# 🚀 Quick Start Guide - Koda
 
-This guide shows you **all the ways** to start and use BrowserAgent.
+This guide shows you **all the ways** to start and use Koda.
 
 ---
 
 ## ⚡ Fastest Way to Start (Library Mode)
 
-The **easiest and most reliable** way to use BrowserAgent is programmatically in your JavaScript code:
+The **easiest and most reliable** way to use Koda is programmatically in your JavaScript code:
 
 ```javascript
 const { createAgent } = require('@trentpierce/browser-agent');
@@ -67,7 +67,7 @@ node bin/browser-agent.js standalone
 
 ## 🌐 Method 2: Server Mode (REST API)
 
-Start BrowserAgent as an API server:
+Start Koda as an API server:
 
 ```bash
 # Start the server
@@ -321,4 +321,4 @@ For **mobile testing**:
 
 ---
 
-**Need Help?** Open an issue at https://github.com/TrentPierce/BrowserAgent/issues
+**Need Help?** Open an issue at https://github.com/TrentPierce/Koda/issues

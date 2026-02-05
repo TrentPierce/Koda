@@ -7,7 +7,7 @@
  * Provides a unified API for launching Chrome, Firefox, Safari, and Edge.
  * 
  * @author Trent Pierce
- * @license BrowserAgent Non-Commercial License
+ * @license Koda Non-Commercial License
  * @copyright 2026 Trent Pierce
  * ============================================================================
  */

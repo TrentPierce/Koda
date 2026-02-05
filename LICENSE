@@ -1,4 +1,4 @@
-BrowserAgent Non-Commercial License with Attribution
+Koda Non-Commercial License with Attribution
 Version 1.0, February 2026
 
 Copyright (c) 2026 Trent Pierce
@@ -23,7 +23,7 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
    transformation or translation of a Source form.
 
    "Work" shall mean the work of authorship made available under this
-   License, including BrowserAgent and all associated files.
+   License, including Koda and all associated files.
 
    "Derivative Works" shall mean any work that is based on the Work.
 
@@ -49,20 +49,20 @@ grants You a worldwide, royalty-free, non-exclusive license to:
 3. ATTRIBUTION REQUIREMENT
 
    You MUST provide clear and visible attribution to Trent Pierce as the
-creator of BrowserAgent in all of the following situations:
+creator of Koda in all of the following situations:
 
    a. IN SOURCE CODE: Include the following header in all source files:
       ```
-      // This project uses BrowserAgent by Trent Pierce
-      // https://github.com/TrentPierce/BrowserAgent
-      // Licensed under the BrowserAgent Non-Commercial License
+      // This project uses Koda by Trent Pierce
+      // https://github.com/TrentPierce/Koda
+      // Licensed under the Koda Non-Commercial License
       ```
 
    b. IN DOCUMENTATION: Include attribution in your README and docs:
       ```
       ## Acknowledgments
-      This project uses [BrowserAgent](https://github.com/TrentPierce/BrowserAgent) 
-      by Trent Pierce, licensed under the BrowserAgent Non-Commercial License.
+      This project uses [Koda](https://github.com/TrentPierce/Koda) 
+      by Trent Pierce, licensed under the Koda Non-Commercial License.
       ```
 
    c. IN USER INTERFACES: Display attribution in any UI that uses the Work:
@@ -72,15 +72,15 @@ creator of BrowserAgent in all of the following situations:
 
    d. IN ACADEMIC/PUBLISHED WORKS: Include citation:
       ```
-      Pierce, T. (2026). BrowserAgent: AI-Powered Browser Automation. 
-      https://github.com/TrentPierce/BrowserAgent
+      Pierce, T. (2026). Koda: AI-Powered Browser Automation. 
+      https://github.com/TrentPierce/Koda
       ```
 
    e. IN PUBLIC FORKS/DERIVATIVES: The README must prominently state:
       ```
-      ## Based on BrowserAgent
-      This project is derived from BrowserAgent by Trent Pierce.
-      Original work: https://github.com/TrentPierce/BrowserAgent
+      ## Based on Koda
+      This project is derived from Koda by Trent Pierce.
+      Original work: https://github.com/TrentPierce/Koda
       ```
 
 4. COMMERCIAL USE PROHIBITION
@@ -171,4 +171,4 @@ a separate commercial license from the Licensor. Commercial licensing
 inquiries should be directed to the contact information above.
 
 This License is based on principles from the PolyForm Noncommercial
-License but is customized specifically for BrowserAgent.
+License but is customized specifically for Koda.

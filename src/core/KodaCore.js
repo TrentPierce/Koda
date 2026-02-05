@@ -1,14 +1,14 @@
 /**
- * BrowserAgentCore - Core browser automation engine
+ * KodaCore - Core browser automation engine
  * Provides the main automation logic for library mode
- * @module BrowserAgentCore
+ * @module KodaCore
  */
 
 const EventEmitter = require('events');
 
-class BrowserAgentCore extends EventEmitter {
+class KodaCore extends EventEmitter {
   /**
-     * Create BrowserAgentCore instance
+     * Create KodaCore instance
      * @param {Object} options - Configuration options
      * @param {Object} options.llmProvider - LLM provider instance
      * @param {Object} options.orchestrator - Task orchestrator
@@ -45,7 +45,7 @@ class BrowserAgentCore extends EventEmitter {
      */
   async init() {
     if (this.initialized) {
-      throw new Error('BrowserAgentCore already initialized');
+      throw new Error('KodaCore already initialized');
     }
         
     // Initialize browser (Electron or Puppeteer based on environment)
@@ -373,7 +373,7 @@ class BrowserAgentCore extends EventEmitter {
      */
   ensureInitialized() {
     if (!this.initialized) {
-      throw new Error('BrowserAgentCore not initialized');
+      throw new Error('KodaCore not initialized');
     }
   }
     
@@ -395,4 +395,4 @@ class BrowserAgentCore extends EventEmitter {
   }
 }
 
-module.exports = { BrowserAgentCore };
+module.exports = { KodaCore };

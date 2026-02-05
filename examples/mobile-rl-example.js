@@ -337,7 +337,7 @@ async function experienceReplayExample() {
  * Main execution
  */
 async function main() {
-    console.log('BrowserAgent Mobile & RL Examples\n');
+    console.log('Koda Mobile & RL Examples\n');
     console.log('=' .repeat(50));
     
     try {

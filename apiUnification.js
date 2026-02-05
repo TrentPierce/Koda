@@ -18,7 +18,7 @@
  * - Simplified error handling
  * 
  * USAGE:
- * const api = new BrowserAgentAPI();
+ * const api = new KodaAPI();
  * const result = await api.analyze(pageData, { preset: 'production' });
  * 
  * ============================================================================
@@ -61,13 +61,13 @@ const AnalysisMode = {
 };
 
 /**
- * Unified API for BrowserAgent enhancement system
+ * Unified API for Koda enhancement system
  * @class
  * @extends EventEmitter
  */
-class BrowserAgentAPI extends EventEmitter {
+class KodaAPI extends EventEmitter {
     /**
-     * Create a new BrowserAgentAPI instance
+     * Create a new KodaAPI instance
      * @param {Object} options - Configuration options
      * @param {string} [options.version='v2'] - API version
      * @param {string} [options.preset='balanced'] - Configuration preset
@@ -105,7 +105,7 @@ class BrowserAgentAPI extends EventEmitter {
         
         this.setupEventForwarding();
         
-        console.log(`[BrowserAgentAPI] Initialized with version ${this.version}, preset: ${this.preset}`);
+        console.log(`[KodaAPI] Initialized with version ${this.version}, preset: ${this.preset}`);
     }
     
     /**
@@ -211,7 +211,7 @@ class BrowserAgentAPI extends EventEmitter {
         const mode = options.mode || this.determineOptimalMode(pageData);
         const preset = options.preset || this.preset;
         
-        console.log(`[BrowserAgentAPI] Analyzing with mode: ${mode}, preset: ${preset}`);
+        console.log(`[KodaAPI] Analyzing with mode: ${mode}, preset: ${preset}`);
         
         try {
             // Build analysis configuration
@@ -233,7 +233,7 @@ class BrowserAgentAPI extends EventEmitter {
             const duration = Date.now() - startTime;
             this.updateStats(duration, true, mode, preset);
             
-            console.log(`[BrowserAgentAPI] Analysis completed in ${duration}ms`);
+            console.log(`[KodaAPI] Analysis completed in ${duration}ms`);
             
             return enhancedResult;
             
@@ -241,7 +241,7 @@ class BrowserAgentAPI extends EventEmitter {
             const duration = Date.now() - startTime;
             this.updateStats(duration, false, mode, preset);
             
-            console.error(`[BrowserAgentAPI] Analysis failed:`, error.message);
+            console.error(`[KodaAPI] Analysis failed:`, error.message);
             throw error;
         }
     }
@@ -427,7 +427,7 @@ class BrowserAgentAPI extends EventEmitter {
             throw new Error(`Invalid preset: ${preset}`);
         }
         
-        console.log(`[BrowserAgentAPI] Changing preset from ${this.preset} to ${preset}`);
+        console.log(`[KodaAPI] Changing preset from ${this.preset} to ${preset}`);
         this.preset = preset;
         
         // Reconfigure orchestrator (Note: This creates a new instance)
@@ -514,7 +514,7 @@ class BrowserAgentAPI extends EventEmitter {
      * Cleanup and destroy API
      */
     destroy() {
-        console.log('[BrowserAgentAPI] Destroying API');
+        console.log('[KodaAPI] Destroying API');
         
         if (this.orchestrator) {
             this.orchestrator.destroy();
@@ -581,18 +581,18 @@ class BrowserAgentAPI extends EventEmitter {
 /**
  * Create API instance with preset
  * @param {string} preset - Configuration preset
- * @returns {BrowserAgentAPI} API instance
+ * @returns {KodaAPI} API instance
  */
 function createAPI(preset = ConfigPreset.BALANCED) {
-    return new BrowserAgentAPI({ preset });
+    return new KodaAPI({ preset });
 }
 
 /**
  * Create production-ready API
- * @returns {BrowserAgentAPI} Production API instance
+ * @returns {KodaAPI} Production API instance
  */
 function createProductionAPI() {
-    return new BrowserAgentAPI({
+    return new KodaAPI({
         preset: ConfigPreset.PRODUCTION,
         version: APIVersion.V2
     });
@@ -600,17 +600,17 @@ function createProductionAPI() {
 
 /**
  * Create fast API for quick analysis
- * @returns {BrowserAgentAPI} Fast API instance
+ * @returns {KodaAPI} Fast API instance
  */
 function createFastAPI() {
-    return new BrowserAgentAPI({
+    return new KodaAPI({
         preset: ConfigPreset.FAST,
         version: APIVersion.V2
     });
 }
 
 module.exports = {
-    BrowserAgentAPI,
+    KodaAPI,
     APIVersion,
     ConfigPreset,
     AnalysisMode,

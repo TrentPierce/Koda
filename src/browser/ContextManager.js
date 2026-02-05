@@ -7,7 +7,7 @@
  * Enables seamless switching between pages and contexts.
  * 
  * @author Trent Pierce
- * @license BrowserAgent Non-Commercial License
+ * @license Koda Non-Commercial License
  * @copyright 2026 Trent Pierce
  * ============================================================================
  */

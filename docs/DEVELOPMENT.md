@@ -46,8 +46,8 @@ choco install cmake python3 visualstudio2022-workload-vctools
 ### Clone the repository
 
 ```bash
-git clone https://github.com/TrentPierce/BrowserAgent.git
-cd BrowserAgent
+git clone https://github.com/TrentPierce/Koda.git
+cd Koda
 ```
 
 ### Install dependencies
@@ -143,7 +143,7 @@ The project uses three main workflows:
 
 ### CI Status
 
-![CI Pipeline](https://github.com/TrentPierce/BrowserAgent/actions/workflows/ci.yml/badge.svg?branch=dev)
+![CI Pipeline](https://github.com/TrentPierce/Koda/actions/workflows/ci.yml/badge.svg?branch=dev)
 
 ## Troubleshooting
 
@@ -219,7 +219,7 @@ sudo apt-get install libsecret-1-dev
 ## Project Structure
 
 ```
-BrowserAgent/
+Koda/
 ├── .github/
 │   ├── workflows/        # CI/CD workflows
 │   └── changelog-config.json

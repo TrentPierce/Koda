@@ -7,7 +7,7 @@
  * response modification capabilities across all browser adapters.
  * 
  * @author Trent Pierce
- * @license BrowserAgent Non-Commercial License
+ * @license Koda Non-Commercial License
  * @copyright 2026 Trent Pierce
  * ============================================================================
  */
@@ -368,7 +368,7 @@ class NetworkInterceptor {
       log: {
         version: '1.2',
         creator: {
-          name: 'BrowserAgent Network Interceptor',
+          name: 'Koda Network Interceptor',
           version: '1.0.0'
         },
         pages: [{

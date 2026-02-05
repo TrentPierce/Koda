@@ -1,4 +1,4 @@
-# Docker Compose for BrowserAgent
+# Docker Compose for Koda
 # Provides easy multi-container deployment
 
 version: '3.8'

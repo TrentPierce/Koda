@@ -1,12 +1,12 @@
 /**
- * Simple BrowserAgent Example
+ * Simple Koda Example
  * Run with: node example.js
  */
 
 const { createAgent } = require('./src/index.js');
 
 async function main() {
-    console.log('🚀 Starting BrowserAgent...\n');
+    console.log('🚀 Starting Koda...\n');
 
     // Check for API key
     if (!process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY) {
@@ -49,7 +49,7 @@ async function main() {
         // Clean up
         console.log('🧹 Cleaning up...');
         await agent.close();
-        console.log('✅ Done! BrowserAgent closed successfully.');
+        console.log('✅ Done! Koda closed successfully.');
 
     } catch (error) {
         console.error('❌ Error:', error.message);

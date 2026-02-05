@@ -3,16 +3,16 @@
  * Basic test suite to validate core functionality
  */
 
-describe('BrowserAgent Core', () => {
+describe('Koda Core', () => {
   describe('Module Exports', () => {
     test('should export main module', () => {
-      const BrowserAgent = require('../../src/index');
-      expect(BrowserAgent).toBeDefined();
+      const Koda = require('../../src/index');
+      expect(Koda).toBeDefined();
     });
 
     test('main module should be an object', () => {
-      const BrowserAgent = require('../../src/index');
-      expect(typeof BrowserAgent).toBe('object');
+      const Koda = require('../../src/index');
+      expect(typeof Koda).toBe('object');
     });
   });
 
@@ -20,7 +20,7 @@ describe('BrowserAgent Core', () => {
     test('package.json should exist and be valid', () => {
       const pkg = require('../../package.json');
       expect(pkg).toBeDefined();
-      expect(pkg.name).toBe('@trentpierce/browser-agent');
+      expect(pkg.name).toBe('@trentpierce/koda');
       expect(pkg.version).toBeDefined();
     });
 

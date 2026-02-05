@@ -1,6 +1,6 @@
-# Contributing to BrowserAgent
+# Contributing to Koda
 
-Thank you for your interest in contributing to BrowserAgent! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Koda! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents
 
@@ -34,8 +34,8 @@ This project adheres to a code of conduct. By participating, you are expected to
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/BrowserAgent.git
-   cd BrowserAgent
+   git clone https://github.com/YOUR_USERNAME/Koda.git
+   cd Koda
    ```
 
 3. Install dependencies:
@@ -113,7 +113,7 @@ Example:
  * @param {Object} options - Configuration options
  * @param {string} options.provider - LLM provider (gemini, openai, anthropic)
  * @param {string} options.apiKey - API key for the provider
- * @returns {Promise<BrowserAgent>} Initialized agent instance
+ * @returns {Promise<Koda>} Initialized agent instance
  * @example
  * const agent = await createAgent({
  *   provider: 'gemini',
@@ -152,7 +152,7 @@ npm run test:watch
 
 Example:
 ```javascript
-describe('BrowserAgent', () => {
+describe('Koda', () => {
   describe('Initialization', () => {
     test('should initialize with valid config', async () => {
       // Arrange
@@ -245,4 +245,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ---
 
-Thank you for contributing to BrowserAgent! 🚀
+Thank you for contributing to Koda! 🚀

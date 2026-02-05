@@ -1,6 +1,6 @@
-# BrowserAgent Documentation
+# Koda Documentation
 
-Welcome to the BrowserAgent documentation hub. This directory contains comprehensive documentation organized by category.
+Welcome to the Koda documentation hub. This directory contains comprehensive documentation organized by category.
 
 ## 📚 Documentation Structure
 

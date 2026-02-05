@@ -1,6 +1,6 @@
 /**
- * BrowserAgent TypeScript Type Definitions
- * @package @trentpierce/browser-agent
+ * Koda TypeScript Type Definitions
+ * @package @trentpierce/koda
  * @version 2.2.0
  */
 
@@ -10,7 +10,7 @@ import { EventEmitter } from 'events';
 // Core Types
 // ============================================================================
 
-export interface BrowserAgentOptions {
+export interface KodaOptions {
   /** LLM provider: 'gemini', 'openai', 'anthropic' */
   provider?: 'gemini' | 'openai' | 'anthropic';
   /** API key for the provider */
@@ -63,11 +63,11 @@ export interface AgentStats {
 }
 
 // ============================================================================
-// Main BrowserAgent Class
+// Main Koda Class
 // ============================================================================
 
-export declare class BrowserAgent extends EventEmitter {
-  constructor(options?: BrowserAgentOptions);
+export declare class Koda extends EventEmitter {
+  constructor(options?: KodaOptions);
   
   /** Initialize the browser agent */
   init(): Promise<void>;
@@ -104,8 +104,8 @@ export declare class BrowserAgent extends EventEmitter {
   close(): Promise<void>;
 }
 
-/** Create a new BrowserAgent instance (convenience function) */
-export declare function createAgent(options?: BrowserAgentOptions): Promise<BrowserAgent>;
+/** Create a new Koda instance (convenience function) */
+export declare function createAgent(options?: KodaOptions): Promise<Koda>;
 
 // ============================================================================
 // LLM Providers
@@ -523,7 +523,7 @@ export declare class LoadBalancer {
 // Exports
 // ============================================================================
 
-export { BrowserAgentCore } from './core/BrowserAgentCore';
+export { KodaCore } from './core/KodaCore';
 export { TaskOrchestrator } from './taskOrchestrator';
 
 // Mobile exports

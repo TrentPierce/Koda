@@ -10,7 +10,7 @@
  *
  * This implementation:
  * - Uses only the public documented API (https://api.browserbase.com)
- * - Contains 100% original code written for BrowserAgent
+ * - Contains 100% original code written for Koda
  * - Uses axios (MIT licensed) for HTTP requests
  * - Complies with all Browserbase terms of service
  *

@@ -7,7 +7,7 @@
  * Enables time-travel debugging similar to Cypress.
  * 
  * @author Trent Pierce
- * @license BrowserAgent Non-Commercial License
+ * @license Koda Non-Commercial License
  * @copyright 2026 Trent Pierce
  * ============================================================================
  */

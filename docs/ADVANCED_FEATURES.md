@@ -591,6 +591,6 @@ All workflows provide:
 ## Support
 
 For issues, questions, or contributions:
-- GitHub Issues: https://github.com/TrentPierce/BrowserAgent/issues
-- Documentation: https://github.com/TrentPierce/BrowserAgent/docs
-- Examples: https://github.com/TrentPierce/BrowserAgent/examples
+- GitHub Issues: https://github.com/TrentPierce/Koda/issues
+- Documentation: https://github.com/TrentPierce/Koda/docs
+- Examples: https://github.com/TrentPierce/Koda/examples

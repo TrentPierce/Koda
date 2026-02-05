@@ -345,7 +345,7 @@ npm start
 The main class for browser automation with Stagehand-compatible API.
 
 ```javascript
-const { BrowserAgent, createAgent } = require('@trentpierce/koda');
+const { Koda, createAgent } = require('@trentpierce/koda');
 
 // Create and initialize agent
 const agent = await createAgent(options);
@@ -1020,7 +1020,7 @@ const agent = await createAgent({
 
 ### Getting Help
 
-- **GitHub Issues**: https://github.com/TrentPierce/BrowserAgent/issues
+- **GitHub Issues**: https://github.com/TrentPierce/Koda/issues
 - **Documentation**: See `/docs` directory for detailed guides
 - **Examples**: Check `/examples` directory for working code samples
 
@@ -1148,7 +1148,7 @@ async function learnWebNavigation() {
 - **[Mobile Automation Guide](docs/MOBILE_AUTOMATION.md)** - Complete mobile automation documentation
 - **[Reinforcement Learning Guide](docs/REINFORCEMENT_LEARNING.md)** - RL algorithms and usage
 - **[Advanced Features](docs/ADVANCED_FEATURES.md)** - Enterprise and advanced capabilities
-- **[Quick Start Guide](QUICKSTART.md)** - All the ways to start BrowserAgent
+- **[Quick Start Guide](QUICKSTART.md)** - All the ways to start Koda
 - **[Development Guide](CONTRIBUTING.md)** - How to contribute to the project
 
 ## API Reference
@@ -1205,7 +1205,7 @@ await manager.installApp(udid, appPath, platform);
 ### System Layers
 
 ```
-BrowserAgent v2.2
+Koda v2.2
 ├── Deployment Layer
 │   ├── Standalone (Electron)
 │   ├── Library (npm)
@@ -1379,7 +1379,7 @@ See `.github/workflows/` for details.
 
 ## License
 
-**BrowserAgent Non-Commercial License with Attribution**
+**Koda Non-Commercial License with Attribution**
 
 This project is licensed under a custom non-commercial license that requires attribution.
 

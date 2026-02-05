@@ -3,8 +3,8 @@
  * These tests verify the core module structure is intact
  */
 
-describe('BrowserAgent Main Module', () => {
-  let BrowserAgent;
+describe('Koda Main Module', () => {
+  let Koda;
 
   beforeAll(() => {
     // Mock any external dependencies if needed
@@ -14,8 +14,8 @@ describe('BrowserAgent Main Module', () => {
 
   test('should export main module', () => {
     try {
-      BrowserAgent = require('../../src/index');
-      expect(BrowserAgent).toBeDefined();
+      Koda = require('../../src/index');
+      expect(Koda).toBeDefined();
     } catch (error) {
       // If native modules fail to load, that's okay for now
       console.warn('Module import failed (expected with missing native deps):', error.message);
@@ -25,8 +25,8 @@ describe('BrowserAgent Main Module', () => {
 
   test('should have expected structure', () => {
     try {
-      BrowserAgent = require('../../src/index');
-      expect(typeof BrowserAgent).toBe('object');
+      Koda = require('../../src/index');
+      expect(typeof Koda).toBe('object');
     } catch (error) {
       // Gracefully handle missing native dependencies
       expect(true).toBe(true);
@@ -37,7 +37,7 @@ describe('BrowserAgent Main Module', () => {
 describe('Package Configuration', () => {
   test('package.json should be valid', () => {
     const pkg = require('../../package.json');
-    expect(pkg.name).toBe('@trentpierce/browser-agent');
+    expect(pkg.name).toBe('@trentpierce/koda');
     expect(pkg.version).toBeDefined();
     expect(pkg.main).toBe('src/index.js');
   });

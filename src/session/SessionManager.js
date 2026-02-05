@@ -7,7 +7,7 @@
  * Enables persistent logins across browser sessions.
  * 
  * @author Trent Pierce
- * @license BrowserAgent Non-Commercial License
+ * @license Koda Non-Commercial License
  * @copyright 2026 Trent Pierce
  * ============================================================================
  */

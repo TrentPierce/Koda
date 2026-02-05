@@ -1,6 +1,6 @@
 /**
  * REST API Server
- * Provides HTTP API for BrowserAgent cloud deployment
+ * Provides HTTP API for Koda cloud deployment
  * @module RestAPIServer
  */
 
@@ -277,8 +277,8 @@ class RestAPIServer extends EventEmitter {
      * @private
      */
   async createAgent(sessionId, options) {
-    const { BrowserAgent } = require('../index');
-    const agent = new BrowserAgent(options);
+    const { Koda } = require('../index');
+    const agent = new Koda(options);
     await agent.init();
         
     this.agents.set(sessionId, agent);

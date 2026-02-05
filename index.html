@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="BrowserAgent - Enterprise AI-powered browser automation platform">
-    <title>BrowserAgent - AI Browser Automation</title>
+    <meta name="description" content="Koda - Enterprise AI-powered browser automation platform">
+    <title>Koda - AI Browser Automation</title>
     <meta name="theme-color" content="#1a5f4e">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1382,7 +1382,7 @@
             <div class="sidebar-header">
                 <div class="logo">
                     <div class="logo-icon">🤖</div>
-                    <span class="logo-text">BrowserAgent</span>
+                    <span class="logo-text">Koda</span>
                 </div>
                 <button class="sidebar-toggle tooltip" id="sidebarToggle" data-tooltip="Toggle sidebar"
                     aria-label="Toggle sidebar">
@@ -1502,7 +1502,7 @@
                         <div class="log-entry">
                             <div class="log-header">
                                 <div class="log-avatar system">🤖</div>
-                                <span class="log-author">BrowserAgent</span>
+                                <span class="log-author">Koda</span>
                                 <span class="log-time">Just now</span>
                             </div>
                             <div class="log-message">Ready to help! Enter your goal above and click Start.</div>
@@ -1551,7 +1551,7 @@
                 <!-- Welcome Screen (shown initially) -->
                 <div class="welcome-screen" id="welcomeScreen">
                     <div class="welcome-icon">🌐</div>
-                    <h1 class="welcome-title">Welcome to BrowserAgent</h1>
+                    <h1 class="welcome-title">Welcome to Koda</h1>
                     <p class="welcome-subtitle">
                         Your AI-powered browser assistant. Tell me what you want to do, and I'll help you navigate the
                         web.
@@ -1657,7 +1657,7 @@
 
                 // Log updates
                 window.electronAPI.onAgentLog((message) => {
-                    this.addLogEntry('agent', 'BrowserAgent', message);
+                    this.addLogEntry('agent', 'Koda', message);
 
                     // Track progress based on log messages
                     if (message.includes('Navigating') || message.includes('goto')) {
@@ -1698,12 +1698,12 @@
                 // Questions from agent
                 window.electronAPI.onAgentQuestion((data) => {
                     this.showDialog('Question', data.question, data.options || []);
-                    this.addLogEntry('agent', 'BrowserAgent', 'Asked a question: ' + data.question);
+                    this.addLogEntry('agent', 'Koda', 'Asked a question: ' + data.question);
                 });
 
                 // Chat messages
                 window.electronAPI.onChatMessage((data) => {
-                    const author = data.sender === 'user' ? 'You' : 'BrowserAgent';
+                    const author = data.sender === 'user' ? 'You' : 'Koda';
                     this.addLogEntry(data.sender, author, data.message);
                 });
 
@@ -1831,7 +1831,7 @@
                 this.elements.advancedPanel.classList.toggle('visible', mode === 'advanced');
 
                 // Log mode change
-                this.addLogEntry('system', 'BrowserAgent', `Switched to ${mode} mode`);
+                this.addLogEntry('system', 'Koda', `Switched to ${mode} mode`);
             }
 
             setupWelcomeExamples() {
@@ -1847,7 +1847,7 @@
             startAgent() {
                 const goal = this.elements.goalInput.value.trim();
                 if (!goal) {
-                    this.addLogEntry('system', 'BrowserAgent', 'Please enter a goal first');
+                    this.addLogEntry('system', 'Koda', 'Please enter a goal first');
                     return;
                 }
 
@@ -1870,9 +1870,9 @@
 
                 // Log start
                 this.addLogEntry('user', 'You', goal);
-                this.addLogEntry('agent', 'BrowserAgent', 'Starting automation...');
+                this.addLogEntry('agent', 'Koda', 'Starting automation...');
 
-                this.addLogEntry('agent', 'BrowserAgent', 'Starting automation...');
+                this.addLogEntry('agent', 'Koda', 'Starting automation...');
 
                 // Get active webContentsId
                 const activeWebview = window.tabManager.getActiveWebview();
@@ -1912,7 +1912,7 @@
                 clearInterval(this.state.timerInterval);
 
                 // Log stop
-                this.addLogEntry('agent', 'BrowserAgent', 'Automation stopped');
+                this.addLogEntry('agent', 'Koda', 'Automation stopped');
 
                 // Don't call stopAgent again if we're already stopping - prevents endless loop
                 // The main process will notify us when agent is fully stopped

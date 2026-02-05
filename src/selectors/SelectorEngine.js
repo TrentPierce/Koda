@@ -7,7 +7,7 @@
  * Implements self-healing capabilities with fallback strategies.
  * 
  * @author Trent Pierce
- * @license BrowserAgent Non-Commercial License
+ * @license Koda Non-Commercial License
  * @copyright 2026 Trent Pierce
  * ============================================================================
  */

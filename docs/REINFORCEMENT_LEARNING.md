@@ -1,6 +1,6 @@
 # Reinforcement Learning Guide
 
-Comprehensive guide for using BrowserAgent's reinforcement learning capabilities.
+Comprehensive guide for using Koda's reinforcement learning capabilities.
 
 ## Table of Contents
 
@@ -17,7 +17,7 @@ Comprehensive guide for using BrowserAgent's reinforcement learning capabilities
 
 ## Overview
 
-BrowserAgent includes a comprehensive reinforcement learning system that enables the agent to learn and improve from experience. The system supports:
+Koda includes a comprehensive reinforcement learning system that enables the agent to learn and improve from experience. The system supports:
 
 - **Q-Learning**: Value-based learning for discrete actions
 - **Policy Gradient**: Direct policy optimization

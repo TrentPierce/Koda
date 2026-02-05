@@ -10,7 +10,7 @@
  *
  * This implementation:
  * - Implements custom session pooling and queue management
- * - Contains 100% original code written for BrowserAgent
+ * - Contains 100% original code written for Koda
  * - Uses standard Node.js EventEmitter
  * - Complies with all Browserbase terms of service
  */

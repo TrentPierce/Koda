@@ -7,7 +7,7 @@
  * Supports headless and headed modes, extensions, and debugging.
  * 
  * @author Trent Pierce
- * @license BrowserAgent Non-Commercial License
+ * @license Koda Non-Commercial License
  * @copyright 2026 Trent Pierce
  * ============================================================================
  */

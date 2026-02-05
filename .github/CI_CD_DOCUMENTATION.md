@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains the CI/CD workflows and configurations for the BrowserAgent project.
+This directory contains the CI/CD workflows and configurations for the Koda project.
 
 ## Workflows
 

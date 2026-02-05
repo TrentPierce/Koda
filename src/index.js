@@ -1,17 +1,17 @@
 /**
- * BrowserAgent - Intelligent Browser Automation Library
+ * Koda - Intelligent Browser Automation Library
  * Main entry point for library mode
- * @module browser-agent
+ * @module koda
  * 
- * This project uses BrowserAgent by Trent Pierce
- * https://github.com/TrentPierce/BrowserAgent
- * Licensed under the BrowserAgent Non-Commercial License
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
  * 
  * Copyright (c) 2026 Trent Pierce. All rights reserved.
  * See LICENSE file for full terms.
  */
 
-const { BrowserAgentCore } = require('./core/BrowserAgentCore');
+const { KodaCore } = require('./core/KodaCore');
 const { LLMProviderFactory } = require('./providers/LLMProviderFactory');
 const { TaskOrchestrator } = require('../taskOrchestrator');
 const { ToolRegistry } = require('./tools/ToolRegistry');
@@ -55,24 +55,24 @@ const { DOMSnapshotManager } = require('./debugging');
 const { HumanBehaviorSimulator } = require('./human');
 
 /**
- * Stagehand-compatible BrowserAgent
+ * Stagehand-compatible Koda
  * Provides a simple API interface similar to Stagehand while maintaining
- * the advanced capabilities of BrowserAgent
+ * the advanced capabilities of Koda
  */
-class BrowserAgent {
-  /**
-     * Create a new BrowserAgent instance
-     * @param {Object} options - Configuration options
-     * @param {string} options.provider - LLM provider: 'gemini', 'openai', 'anthropic'
-     * @param {string} options.apiKey - API key for the provider
-     * @param {Object} options.llmConfig - Additional LLM configuration
-     * @param {boolean} options.headless - Run in headless mode (default: false)
-     * @param {boolean} options.enableLearning - Enable adaptive learning (default: true)
-     * @param {boolean} options.enableVisualAnalysis - Enable visual understanding (default: true)
-     * @param {boolean} options.enableTemporalAnalysis - Enable temporal awareness (default: true)
-     * @param {boolean} options.enableDecisionFusion - Enable intelligent decision-making (default: true)
-     * @param {Object} options.orchestratorConfig - TaskOrchestrator configuration
-     */
+class Koda {
+/**
+   * Create a new Koda instance
+   * @param {Object} options - Configuration options
+   * @param {string} options.provider - LLM provider: 'gemini', 'openai', 'anthropic'
+   * @param {string} options.apiKey - API key for the provider
+   * @param {Object} options.llmConfig - Additional LLM configuration
+   * @param {boolean} options.headless - Run in headless mode (default: false)
+   * @param {boolean} options.enableLearning - Enable adaptive learning (default: true)
+   * @param {boolean} options.enableVisualAnalysis - Enable visual understanding (default: true)
+   * @param {boolean} options.enableTemporalAnalysis - Enable temporal awareness (default: true)
+   * @param {boolean} options.enableDecisionFusion - Enable intelligent decision-making (default: true)
+   * @param {Object} options.orchestratorConfig - TaskOrchestrator configuration
+   */
   constructor(options = {}) {
     this.options = {
       provider: options.provider || 'gemini',
@@ -99,7 +99,7 @@ class BrowserAgent {
      */
   async init() {
     if (this.initialized) {
-      throw new Error('BrowserAgent already initialized');
+      throw new Error('Koda already initialized');
     }
 
     // Initialize LLM provider
@@ -123,7 +123,7 @@ class BrowserAgent {
     this.toolRegistry = new ToolRegistry();
 
     // Initialize core agent
-    this.core = new BrowserAgentCore({
+    this.core = new KodaCore({
       llmProvider: this.llmProvider,
       orchestrator: this.orchestrator,
       toolRegistry: this.toolRegistry,
@@ -244,29 +244,29 @@ class BrowserAgent {
      */
   ensureInitialized() {
     if (!this.initialized) {
-      throw new Error('BrowserAgent not initialized. Call init() first.');
+      throw new Error('Koda not initialized. Call init() first.');
     }
   }
 }
 
 /**
- * Create a new BrowserAgent instance (convenience function)
+ * Create a new Koda instance (convenience function)
  * @param {Object} options - Configuration options
- * @returns {Promise<BrowserAgent>} Initialized agent
+ * @returns {Promise<Koda>} Initialized agent
  */
 async function createAgent(options = {}) {
-  const agent = new BrowserAgent(options);
+  const agent = new Koda(options);
   await agent.init();
   return agent;
 }
 
 module.exports = {
-  // Main BrowserAgent
-  BrowserAgent,
+  // Main Koda
+  Koda,
   createAgent,
   
   // Core Components
-  BrowserAgentCore,
+  KodaCore,
   LLMProviderFactory,
   TaskOrchestrator,
   ToolRegistry,
