@@ -14,7 +14,10 @@
     "test": "jest",
     "build": "npm run build:docs",
     "build:docs": "jsdoc -c jsdoc.json",
-    "prepublishOnly": "npm test"
+    "prepublishOnly": "npm test",
+    "docker:build": "docker build -t browser-agent .",
+    "docker:run": "docker-compose up -d",
+    "docker:stop": "docker-compose down"
   },
   "keywords": [
     "browser-automation",
@@ -25,10 +28,15 @@
     "anthropic",
     "stagehand",
     "electron",
+    "puppeteer",
     "web-automation",
     "machine-learning",
     "adaptive-learning",
-    "visual-understanding"
+    "visual-understanding",
+    "mcp",
+    "cloud",
+    "api",
+    "websocket"
   ],
   "author": "Trent Pierce",
   "license": "MIT",
@@ -54,7 +62,9 @@
     "ws": "^8.14.2",
     "cors": "^2.8.5",
     "helmet": "^7.1.0",
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "commander": "^11.1.0",
+    "puppeteer": "^21.5.0"
   },
   "devDependencies": {
     "@electron/rebuild": "^4.0.3",
