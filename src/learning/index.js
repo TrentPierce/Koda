@@ -12,11 +12,11 @@ const LearningDatabase = require('./learningDatabase');
 const StateRepresentation = require('./stateRepresentation');
 
 module.exports = {
-    ReinforcementAgent,
-    QLearning,
-    RewardSystem,
-    ExperienceReplay,
-    PolicyGradient,
-    LearningDatabase,
-    StateRepresentation
+  ReinforcementAgent,
+  QLearning,
+  RewardSystem,
+  ExperienceReplay,
+  PolicyGradient,
+  LearningDatabase,
+  StateRepresentation
 };

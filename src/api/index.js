@@ -8,6 +8,6 @@ const { RestAPIServer } = require('./RestAPIServer');
 const { WebSocketServer } = require('./WebSocketServer');
 
 module.exports = {
-    RestAPIServer,
-    WebSocketServer
+  RestAPIServer,
+  WebSocketServer
 };

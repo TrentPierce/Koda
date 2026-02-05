@@ -6,8 +6,24 @@
  */
 
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const sharp = require('sharp');
-const cv = require('opencv4nodejs');
+
+// Handle optional dependencies
+let sharp;
+let cv;
+
+try {
+  sharp = require('sharp');
+} catch (error) {
+  // sharp is an optional dependency
+  sharp = null;
+}
+
+try {
+  cv = require('opencv4nodejs');
+} catch (error) {
+  // opencv4nodejs is an optional dependency
+  cv = null;
+}
 
 class ComputerVision {
   constructor(config = {}) {

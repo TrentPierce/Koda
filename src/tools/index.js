@@ -12,10 +12,10 @@ const { FileTool } = require('./FileTool');
 const { ScreenshotTool } = require('./ScreenshotTool');
 
 module.exports = {
-    ToolRegistry,
-    WebSearchTool,
-    DatabaseTool,
-    APITool,
-    FileTool,
-    ScreenshotTool
+  ToolRegistry,
+  WebSearchTool,
+  DatabaseTool,
+  APITool,
+  FileTool,
+  ScreenshotTool
 };

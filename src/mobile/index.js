@@ -11,10 +11,10 @@ const MobileStateDetector = require('./mobileStateDetector');
 const DeviceManager = require('./deviceManager');
 
 module.exports = {
-    MobileAgent,
-    MobileDriver,
-    MobileCommands,
-    PlatformSelectors,
-    MobileStateDetector,
-    DeviceManager
+  MobileAgent,
+  MobileDriver,
+  MobileCommands,
+  PlatformSelectors,
+  MobileStateDetector,
+  DeviceManager
 };

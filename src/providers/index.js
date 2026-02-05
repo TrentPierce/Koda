@@ -10,8 +10,8 @@ const { OpenAIProvider } = require('./OpenAIProvider');
 const { AnthropicProvider } = require('./AnthropicProvider');
 
 module.exports = {
-    LLMProviderFactory,
-    GeminiProvider,
-    OpenAIProvider,
-    AnthropicProvider
+  LLMProviderFactory,
+  GeminiProvider,
+  OpenAIProvider,
+  AnthropicProvider
 };

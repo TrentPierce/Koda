@@ -1,0 +1,39 @@
+# Auto detect text files and normalize line endings
+* text=auto
+
+# Source code
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+
+# Scripts
+*.sh text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Config files
+.env text eol=lf
+.env.example text eol=lf
+.eslintrc.json text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Documentation
+*.md text eol=lf
+LICENSE text eol=lf
+
+# Binary files (don't modify)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.db binary

@@ -9,200 +9,200 @@ const path = require('path');
 const EventEmitter = require('events');
 
 class FileTool extends EventEmitter {
-    /**
+  /**
      * Create file tool
      * @param {Object} config - Configuration
      */
-    constructor(config = {}) {
-        super();
+  constructor(config = {}) {
+    super();
         
-        this.config = {
-            baseDir: config.baseDir || process.cwd(),
-            allowedExtensions: config.allowedExtensions || null,
-            maxFileSize: config.maxFileSize || 10 * 1024 * 1024, // 10MB
-            ...config
-        };
-    }
+    this.config = {
+      baseDir: config.baseDir || process.cwd(),
+      allowedExtensions: config.allowedExtensions || null,
+      maxFileSize: config.maxFileSize || 10 * 1024 * 1024, // 10MB
+      ...config
+    };
+  }
     
-    /**
+  /**
      * Execute file operation
      * @param {string} operation - Operation type
      * @param {Object} options - Operation options
      * @returns {Promise<any>} Result
      */
-    async execute(operation, options = {}) {
-        this.emit('executing', { operation, options });
+  async execute(operation, options = {}) {
+    this.emit('executing', { operation, options });
         
-        try {
-            let result;
+    try {
+      let result;
             
-            switch (operation) {
-                case 'read':
-                    result = await this.read(options.path, options.encoding);
-                    break;
+      switch (operation) {
+        case 'read':
+          result = await this.read(options.path, options.encoding);
+          break;
                 
-                case 'write':
-                    result = await this.write(options.path, options.content, options.encoding);
-                    break;
+        case 'write':
+          result = await this.write(options.path, options.content, options.encoding);
+          break;
                 
-                case 'append':
-                    result = await this.append(options.path, options.content, options.encoding);
-                    break;
+        case 'append':
+          result = await this.append(options.path, options.content, options.encoding);
+          break;
                 
-                case 'delete':
-                    result = await this.delete(options.path);
-                    break;
+        case 'delete':
+          result = await this.delete(options.path);
+          break;
                 
-                case 'list':
-                    result = await this.list(options.path);
-                    break;
+        case 'list':
+          result = await this.list(options.path);
+          break;
                 
-                case 'exists':
-                    result = await this.exists(options.path);
-                    break;
+        case 'exists':
+          result = await this.exists(options.path);
+          break;
                 
-                case 'stat':
-                    result = await this.stat(options.path);
-                    break;
+        case 'stat':
+          result = await this.stat(options.path);
+          break;
                 
-                default:
-                    throw new Error(`Unknown operation: ${operation}`);
-            }
+        default:
+          throw new Error(`Unknown operation: ${operation}`);
+      }
             
-            this.emit('executed', { operation, result });
+      this.emit('executed', { operation, result });
             
-            return result;
-        } catch (error) {
-            this.emit('executionFailed', { operation, error: error.message });
-            throw error;
-        }
+      return result;
+    } catch (error) {
+      this.emit('executionFailed', { operation, error: error.message });
+      throw error;
     }
+  }
     
-    /**
+  /**
      * Read file
      * @private
      */
-    async read(filePath, encoding = 'utf8') {
-        const fullPath = this.resolvePath(filePath);
-        this.validatePath(fullPath);
+  async read(filePath, encoding = 'utf8') {
+    const fullPath = this.resolvePath(filePath);
+    this.validatePath(fullPath);
         
-        return await fs.readFile(fullPath, encoding);
-    }
+    return await fs.readFile(fullPath, encoding);
+  }
     
-    /**
+  /**
      * Write file
      * @private
      */
-    async write(filePath, content, encoding = 'utf8') {
-        const fullPath = this.resolvePath(filePath);
-        this.validatePath(fullPath);
+  async write(filePath, content, encoding = 'utf8') {
+    const fullPath = this.resolvePath(filePath);
+    this.validatePath(fullPath);
         
-        await fs.writeFile(fullPath, content, encoding);
-        return { success: true, path: fullPath };
-    }
+    await fs.writeFile(fullPath, content, encoding);
+    return { success: true, path: fullPath };
+  }
     
-    /**
+  /**
      * Append to file
      * @private
      */
-    async append(filePath, content, encoding = 'utf8') {
-        const fullPath = this.resolvePath(filePath);
-        this.validatePath(fullPath);
+  async append(filePath, content, encoding = 'utf8') {
+    const fullPath = this.resolvePath(filePath);
+    this.validatePath(fullPath);
         
-        await fs.appendFile(fullPath, content, encoding);
-        return { success: true, path: fullPath };
-    }
+    await fs.appendFile(fullPath, content, encoding);
+    return { success: true, path: fullPath };
+  }
     
-    /**
+  /**
      * Delete file
      * @private
      */
-    async delete(filePath) {
-        const fullPath = this.resolvePath(filePath);
-        this.validatePath(fullPath);
+  async delete(filePath) {
+    const fullPath = this.resolvePath(filePath);
+    this.validatePath(fullPath);
         
-        await fs.unlink(fullPath);
-        return { success: true, path: fullPath };
-    }
+    await fs.unlink(fullPath);
+    return { success: true, path: fullPath };
+  }
     
-    /**
+  /**
      * List directory
      * @private
      */
-    async list(dirPath) {
-        const fullPath = this.resolvePath(dirPath);
-        this.validatePath(fullPath);
+  async list(dirPath) {
+    const fullPath = this.resolvePath(dirPath);
+    this.validatePath(fullPath);
         
-        const entries = await fs.readdir(fullPath, { withFileTypes: true });
+    const entries = await fs.readdir(fullPath, { withFileTypes: true });
         
-        return entries.map(entry => ({
-            name: entry.name,
-            isDirectory: entry.isDirectory(),
-            isFile: entry.isFile()
-        }));
-    }
+    return entries.map(entry => ({
+      name: entry.name,
+      isDirectory: entry.isDirectory(),
+      isFile: entry.isFile()
+    }));
+  }
     
-    /**
+  /**
      * Check if path exists
      * @private
      */
-    async exists(filePath) {
-        const fullPath = this.resolvePath(filePath);
+  async exists(filePath) {
+    const fullPath = this.resolvePath(filePath);
         
-        try {
-            await fs.access(fullPath);
-            return true;
-        } catch {
-            return false;
-        }
+    try {
+      await fs.access(fullPath);
+      return true;
+    } catch {
+      return false;
     }
+  }
     
-    /**
+  /**
      * Get file stats
      * @private
      */
-    async stat(filePath) {
-        const fullPath = this.resolvePath(filePath);
-        this.validatePath(fullPath);
+  async stat(filePath) {
+    const fullPath = this.resolvePath(filePath);
+    this.validatePath(fullPath);
         
-        const stats = await fs.stat(fullPath);
+    const stats = await fs.stat(fullPath);
         
-        return {
-            size: stats.size,
-            created: stats.birthtime,
-            modified: stats.mtime,
-            accessed: stats.atime,
-            isDirectory: stats.isDirectory(),
-            isFile: stats.isFile()
-        };
-    }
+    return {
+      size: stats.size,
+      created: stats.birthtime,
+      modified: stats.mtime,
+      accessed: stats.atime,
+      isDirectory: stats.isDirectory(),
+      isFile: stats.isFile()
+    };
+  }
     
-    /**
+  /**
      * Resolve path relative to base directory
      * @private
      */
-    resolvePath(filePath) {
-        return path.resolve(this.config.baseDir, filePath);
-    }
+  resolvePath(filePath) {
+    return path.resolve(this.config.baseDir, filePath);
+  }
     
-    /**
+  /**
      * Validate path
      * @private
      */
-    validatePath(fullPath) {
-        // Ensure path is within base directory
-        if (!fullPath.startsWith(this.config.baseDir)) {
-            throw new Error('Path is outside allowed base directory');
-        }
-        
-        // Check file extension if restricted
-        if (this.config.allowedExtensions) {
-            const ext = path.extname(fullPath);
-            if (!this.config.allowedExtensions.includes(ext)) {
-                throw new Error(`File extension '${ext}' not allowed`);
-            }
-        }
+  validatePath(fullPath) {
+    // Ensure path is within base directory
+    if (!fullPath.startsWith(this.config.baseDir)) {
+      throw new Error('Path is outside allowed base directory');
     }
+        
+    // Check file extension if restricted
+    if (this.config.allowedExtensions) {
+      const ext = path.extname(fullPath);
+      if (!this.config.allowedExtensions.includes(ext)) {
+        throw new Error(`File extension '${ext}' not allowed`);
+      }
+    }
+  }
 }
 
 module.exports = { FileTool };

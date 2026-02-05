@@ -648,7 +648,7 @@ class SecurityTester {
       "' OR 1=1--",
       "admin'--",
       "' UNION SELECT NULL--",
-      "1; DROP TABLE users--",
+      '1; DROP TABLE users--',
       "' OR 'x'='x",
       "1' AND '1'='1"
     ];
