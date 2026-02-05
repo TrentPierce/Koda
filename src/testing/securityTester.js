@@ -665,7 +665,7 @@ class SecurityTester {
       
       // Special characters
       '!@#$%^&*()_+-=[]{}|;:,.<>?',
-      '\\'\n\r\t\b\f',
+      '\\\'\n\r\t\b\f',
       
       // Unicode
       '\u0000\u0001\u0002',

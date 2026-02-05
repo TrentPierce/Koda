@@ -24,5 +24,13 @@ module.exports = {
     '/coverage/'
   ],
   verbose: true,
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.js']
+  setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  moduleNameMapper: {
+    '^sharp$': '<rootDir>/tests/__mocks__/sharp.js',
+    '^opencv4nodejs$': '<rootDir>/tests/__mocks__/opencv4nodejs.js',
+    '^better-sqlite3$': '<rootDir>/tests/__mocks__/better-sqlite3.js'
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@google/generative-ai)/)'
+  ]
 };
