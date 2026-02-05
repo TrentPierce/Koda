@@ -1,7 +1,7 @@
 {
   "name": "@trentpierce/browser-agent",
-  "version": "2.0.0",
-  "description": "An intelligent AI-powered browser automation library with multi-LLM support, visual understanding, and adaptive learning",
+  "version": "2.1.0",
+  "description": "An intelligent AI-powered browser automation library with multi-LLM support, visual understanding, adaptive learning, mobile automation (iOS/Android), and reinforcement learning",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "bin": {
@@ -21,6 +21,13 @@
   },
   "keywords": [
     "browser-automation",
+    "mobile-automation",
+    "ios-automation",
+    "android-automation",
+    "appium",
+    "reinforcement-learning",
+    "q-learning",
+    "policy-gradient",
     "ai",
     "llm",
     "gemini",
@@ -64,7 +71,9 @@
     "helmet": "^7.1.0",
     "axios": "^1.6.0",
     "commander": "^11.1.0",
-    "puppeteer": "^21.5.0"
+    "puppeteer": "^21.5.0",
+    "webdriverio": "^8.40.0",
+    "@wdio/cli": "^8.40.0"
   },
   "devDependencies": {
     "@electron/rebuild": "^4.0.3",
@@ -74,13 +83,17 @@
   },
   "peerDependencies": {
     "openai": "^4.0.0",
-    "@anthropic-ai/sdk": "^0.9.0"
+    "@anthropic-ai/sdk": "^0.9.0",
+    "appium": "^2.0.0"
   },
   "peerDependenciesMeta": {
     "openai": {
       "optional": true
     },
     "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "appium": {
       "optional": true
     }
   },
@@ -91,6 +104,8 @@
     },
     "./api": "./src/api/index.js",
     "./providers": "./src/providers/index.js",
-    "./tools": "./src/tools/index.js"
+    "./tools": "./src/tools/index.js",
+    "./mobile": "./src/mobile/index.js",
+    "./learning": "./src/learning/index.js"
   }
 }
