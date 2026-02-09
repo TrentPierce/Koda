@@ -16,6 +16,8 @@ See LICENSE file for full terms.
 
 ### AI-Powered Browser Automation
 
+![Koda UI](docs/images/koda_ui.png)
+
 [![Tests](https://github.com/TrentPierce/Koda/actions/workflows/ci.yml/badge.svg)](https://github.com/TrentPierce/Koda/actions)
 [![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial-red.svg)](LICENSE)
 
