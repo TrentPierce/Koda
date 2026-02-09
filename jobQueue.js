@@ -1,26 +1,11 @@
 /**
- * ============================================================================
- * JOB QUEUE SYSTEM - Async Task Management
- * ============================================================================
- * 
- * Manages asynchronous job execution with priority levels, retry logic,
- * and comprehensive status tracking. Supports concurrent job processing
- * with configurable concurrency limits.
- * 
- * FEATURES:
- * - Priority-based job scheduling (HIGH, MEDIUM, LOW)
- * - Automatic retry with exponential backoff
- * - Job status tracking (pending, running, completed, failed, cancelled)
- * - Event-based notifications
- * - Concurrent job processing with limits
- * - Job cancellation support
- * 
- * USAGE:
- * const queue = new JobQueue({ maxConcurrent: 3 });
- * const jobId = await queue.addJob(asyncFunction, args, { priority: 'HIGH' });
- * const result = await queue.waitForJob(jobId);
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

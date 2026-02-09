@@ -1,30 +1,11 @@
 /**
- * ============================================================================
- * TASK ORCHESTRATOR - Parallel Analysis Coordination
- * ============================================================================
- * 
- * Orchestrates parallel DOM and vision analysis tasks using worker threads
- * and job queues. Manages task lifecycle, priority scheduling, error handling,
- * and result aggregation for multiple concurrent analysis operations.
- * 
- * INTEGRATES WITH:
- * - Phase 1: JobQueue, ResultReconciliator
- * - Phase 2: ScreenshotSegmenter, UIElementClassifier, VisualDomMapper
- * - Phase 3: StateTracker, AnimationDetector, TransitionPredictor
- * - Phase 4: BayesianBeliefNetwork, FeedbackSystem, ConfidenceThresholdManager
- * 
- * FEATURES:
- * - Worker thread pool management
- * - Parallel task execution with priority scheduling
- * - Visual analysis integration (Phase 2)
- * - Temporal analysis integration (Phase 3)
- * - Probabilistic decision fusion (Phase 4)
- * - Task cancellation and timeout handling
- * - Error recovery and retry mechanisms
- * - Result aggregation and reconciliation
- * - Performance monitoring and statistics
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const { Worker } = require('worker_threads');

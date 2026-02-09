@@ -1,27 +1,11 @@
 /**
- * ============================================================================
- * API UNIFICATION - Unified High-Level Interface
- * ============================================================================
- * 
- * Provides a simplified, unified API interface that abstracts all 12 components
- * into easy-to-use high-level methods. Supports configuration presets, custom
- * pipelines, backward compatibility, and API versioning.
- * 
- * FEATURES:
- * - Unified interface for all 12 components
- * - High-level methods for common use cases
- * - Configuration presets (fast, balanced, thorough, production)
- * - Custom analysis pipeline builder
- * - Backward compatibility with existing code
- * - API versioning (v1, v2)
- * - Automatic optimization based on requirements
- * - Simplified error handling
- * 
- * USAGE:
- * const api = new KodaAPI();
- * const result = await api.analyze(pageData, { preset: 'production' });
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

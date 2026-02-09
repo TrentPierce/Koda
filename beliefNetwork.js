@@ -1,29 +1,11 @@
 /**
- * ============================================================================
- * BAYESIAN BELIEF NETWORK - Probabilistic Evidence Integration
- * ============================================================================
- * 
- * Implements a Bayesian Belief Network for integrating evidence from multiple
- * analysis sources to make probabilistic decisions about actions. Uses belief
- * propagation to combine evidence and calculate posterior probabilities.
- * 
- * FEATURES:
- * - Bayesian probability calculations
- * - Belief propagation for multi-source evidence
- * - Prior probability management for action types
- * - Likelihood calculation for different evidence sources
- * - Conditional dependency modeling
- * - Uncertainty quantification and confidence intervals
- * - Evidence strength weighting
- * - Posterior probability computation
- * 
- * USAGE:
- * const network = new BayesianBeliefNetwork();
- * network.setActionPrior('click', 0.4);
- * network.addEvidence('dom', 'click', 0.8, 0.9);
- * const belief = network.computeBeliefs();
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

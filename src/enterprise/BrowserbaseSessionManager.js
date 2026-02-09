@@ -1,18 +1,11 @@
 /**
- * Browserbase Session Manager
- * Manages multiple Browserbase sessions with pooling and load balancing
- * @module BrowserbaseSessionManager
- * @version 2.2.0
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
  *
- * IMPORTANT: This is an ORIGINAL implementation for session management.
- * This code does NOT contain any proprietary Browserbase source code.
- * It uses the original BrowserbaseProvider to make API calls to Browserbase's service.
- *
- * This implementation:
- * - Implements custom session pooling and queue management
- * - Contains 100% original code written for Koda
- * - Uses standard Node.js EventEmitter
- * - Complies with all Browserbase terms of service
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const { BrowserbaseProvider, BrowserbaseError } = require('../providers/BrowserbaseProvider');

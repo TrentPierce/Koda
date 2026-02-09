@@ -1,28 +1,11 @@
 /**
- * ============================================================================
- * CONFIDENCE THRESHOLD MANAGER - Dynamic Threshold Management
- * ============================================================================
- * 
- * Manages confidence thresholds dynamically based on historical performance
- * and provides fallback strategy selection for different confidence levels.
- * Optimizes thresholds per domain and assesses risk for actions.
- * 
- * FEATURES:
- * - Dynamic confidence threshold management
- * - Multi-level fallback strategies (high/medium/low confidence)
- * - Threshold adjustment based on historical performance
- * - Domain-specific threshold optimization
- * - Risk assessment for different confidence levels
- * - Adaptive threshold tuning
- * - Fallback chain management
- * - Performance-based threshold calibration
- * 
- * USAGE:
- * const manager = new ConfidenceThresholdManager();
- * const action = manager.selectAction(candidates, domain);
- * manager.updateThresholds(domain, performance);
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

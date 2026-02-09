@@ -1,40 +1,11 @@
 /**
- * ============================================================================
- * ENHANCED AGENT - PRODUCTION CLASS
- * ============================================================================
- * 
- * This is the MAIN agent class used in production. It extends the base Agent
- * class (agent.js) to add intelligent features.
- * 
- * THIS FILE HANDLES:
- * ------------------
- * - Production LLM prompt (askGeminiEnhanced) - THE MAIN PROMPT
- * - Decoy detection & avoidance in prompts
- * - Popup handling priority
- * - Navigation regression prevention
- * - Code/secret discovery guidance
- * - Context & session tracking
- * - Loop/scroll detection
- * - Learning engine integration
- * - Retry logic with error recovery
- * - User interaction & chat
- * 
- * INHERITS FROM agent.js:
- * -----------------------
- * - DOM extraction (getSimplifiedDOM) - detects decoys, filler text, hidden codes
- * - Action execution (executeAction) - click, type, scroll, navigate
- * - Screenshot capture
- * - Basic logging
- * 
- * WHEN MAKING CHANGES:
- * --------------------
- * - LLM prompt improvements        → Edit askGeminiEnhanced() in THIS file
- * - Loop/stuck detection           → Edit loop() in THIS file
- * - Learning/context features      → Edit THIS file
- * - DOM extraction improvements    → Edit getSimplifiedDOM() in agent.js
- * - Action execution improvements  → Edit executeAction() in agent.js
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const Agent = require('./agent');

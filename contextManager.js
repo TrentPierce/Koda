@@ -1,20 +1,11 @@
 /**
- * ============================================================================
- * CONTEXT MANAGER - Session & State Tracking
- * ============================================================================
- * 
- * Tracks the agent's session state, navigation history, and action history.
- * Used by EnhancedAgent to provide context to the LLM and detect loops.
- * 
- * KEY FEATURES:
- * - Session management (start, end, persistence)
- * - URL history tracking
- * - Action history with success/failure tracking
- * - Loop detection (scroll loops, navigation regression, alternating patterns)
- * - DOM snapshot storage
- * - Chat message logging
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const crypto = require('crypto');

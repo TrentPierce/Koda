@@ -1,15 +1,11 @@
 /**
- * ============================================================================
- * BROWSER INTERFACE - Abstract Base Class for All Browser Adapters
- * ============================================================================
- * 
- * Defines the contract that all browser implementations must follow.
- * Enables seamless switching between Chrome, Firefox, Safari, and Edge.
- * 
- * @author Trent Pierce
- * @license Koda Non-Commercial License
- * @copyright 2026 Trent Pierce
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 /**

@@ -1,15 +1,11 @@
 /**
- * ============================================================================
- * NETWORK INTERCEPTOR - Request/Response Interception & Mocking
- * ============================================================================
- * 
- * Provides network interception, request mocking, HAR recording, and
- * response modification capabilities across all browser adapters.
- * 
- * @author Trent Pierce
- * @license Koda Non-Commercial License
- * @copyright 2026 Trent Pierce
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const fs = require('fs').promises;

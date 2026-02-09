@@ -1,27 +1,11 @@
 /**
- * ============================================================================
- * COMPREHENSIVE LOGGER - Structured Logging System
- * ============================================================================
- * 
- * Provides detailed structured logging for all components with multiple
- * severity levels, performance metrics, error tracking, and flexible output
- * formats. Supports log rotation, retention policies, and filtering.
- * 
- * FEATURES:
- * - Structured logging with multiple severity levels
- * - Performance metrics logging
- * - Error tracking with stack traces and context
- * - Multiple log formats (JSON, text, structured)
- * - Log rotation and retention policies
- * - Filtering by component, level, and time
- * - Async logging for performance
- * - Log aggregation and analysis
- * 
- * USAGE:
- * const logger = new ComprehensiveLogger({ level: 'INFO' });
- * logger.info('Analysis completed', { duration: 1234, action: 'click' });
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

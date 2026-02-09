@@ -1,16 +1,11 @@
 /**
- * ============================================================================
- * SAFARI (WEBKIT) BROWSER ADAPTER
- * ============================================================================
- * 
- * Safari/WebKit browser implementation using Playwright.
- * Note: WebKit is Safari's engine on macOS, but Playwright uses a custom
- * WebKit build on all platforms for consistency.
- * 
- * @author Trent Pierce
- * @license Koda Non-Commercial License
- * @copyright 2026 Trent Pierce
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const BrowserAdapter = require('./BrowserAdapter');

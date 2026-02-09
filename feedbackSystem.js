@@ -1,28 +1,11 @@
 /**
- * ============================================================================
- * FEEDBACK SYSTEM - Action Feedback and Strategy Adaptation
- * ============================================================================
- * 
- * Collects and analyzes feedback from action outcomes to adaptively improve
- * decision-making strategies. Uses reinforcement learning principles to
- * adjust parameters and recommend optimal strategies for different domains.
- * 
- * FEATURES:
- * - Action outcome feedback collection
- * - Success/failure pattern analysis
- * - Strategy performance metrics tracking
- * - Adaptive parameter tuning per domain
- * - Reinforcement learning style updates
- * - Strategy recommendation based on historical performance
- * - Domain-specific learning
- * - Exploration vs exploitation balancing
- * 
- * USAGE:
- * const feedback = new FeedbackSystem();
- * feedback.recordOutcome(action, result, duration, success);
- * const recommendation = feedback.recommendStrategy(domain);
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

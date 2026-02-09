@@ -1,30 +1,11 @@
 /**
- * ============================================================================
- * SCREENSHOT SEGMENTER - Visual Region Analysis
- * ============================================================================
- * 
- * Analyzes browser screenshots to detect and classify visual regions such as
- * headers, navigation, content areas, footers, and sidebars. Provides layout
- * analysis and functional area identification for improved vision-based 
- * browser automation.
- * 
- * FEATURES:
- * - Page region detection (header, nav, content, footer, sidebar)
- * - Functional area identification (forms, buttons, lists, tables)
- * - Viewport analysis and scroll position tracking
- * - Responsive design pattern detection
- * - Layout grid analysis
- * - Visual hierarchy detection
- * 
- * USAGE:
- * const segmenter = new ScreenshotSegmenter();
- * const analysis = await segmenter.analyzeScreenshot(imageData, {
- *   width: 1920,
- *   height: 1080,
- *   scrollY: 0
- * });
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

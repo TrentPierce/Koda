@@ -1,28 +1,11 @@
 /**
- * ============================================================================
- * RESULT RECONCILIATION SYSTEM - Multi-Source Analysis Integration
- * ============================================================================
- * 
- * Combines and reconciles results from multiple parallel analysis sources
- * (DOM analysis, vision analysis, pattern matching, etc.) into a single
- * coherent action plan with confidence scoring.
- * 
- * FEATURES:
- * - Multi-source result merging
- * - Confidence-based scoring and weighting
- * - Conflict resolution strategies
- * - Consensus building algorithms
- * - Result validation and sanity checking
- * - Detailed reconciliation reporting
- * 
- * USAGE:
- * const reconciliator = new ResultReconciliator();
- * const result = await reconciliator.reconcile([
- *   { source: 'dom', action: 'click', confidence: 0.8, ... },
- *   { source: 'vision', action: 'click', confidence: 0.9, ... }
- * ]);
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 /**

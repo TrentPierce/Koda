@@ -1,15 +1,11 @@
 /**
- * ============================================================================
- * SELF-HEALING SELECTORS - Adaptive Element Location
- * ============================================================================
- * 
- * Implements intelligent selector healing that adapts when sites change.
- * Uses multiple fallback strategies and learns from successful recoveries.
- * 
- * @author Trent Pierce
- * @license Koda Non-Commercial License
- * @copyright 2026 Trent Pierce
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const { SELECTOR_TYPES } = require('./SelectorEngine');

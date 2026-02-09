@@ -1,27 +1,11 @@
 /**
- * ============================================================================
- * STATE TRACKER - Page State Change Monitoring
- * ============================================================================
- * 
- * Monitors and tracks page state changes through screenshot differencing,
- * DOM mutation tracking, URL monitoring, and viewport changes. Maintains
- * state history for temporal analysis and pattern recognition.
- * 
- * FEATURES:
- * - Screenshot differencing for visual change detection
- * - DOM mutation tracking and comparison
- * - URL change detection and navigation tracking
- * - Scroll position and viewport monitoring
- * - State history with configurable retention
- * - Change magnitude calculation
- * - State snapshot management
- * 
- * USAGE:
- * const tracker = new StateTracker({ maxHistory: 50 });
- * await tracker.captureState({ dom, screenshot, url, viewport });
- * const changes = tracker.detectChanges();
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

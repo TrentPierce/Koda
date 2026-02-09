@@ -1,30 +1,11 @@
 /**
- * ============================================================================
- * UI ELEMENT CLASSIFIER - Visual Element Recognition
- * ============================================================================
- * 
- * Classifies UI elements based on visual characteristics, patterns, and
- * contextual information. Provides confidence scoring for element type
- * identification and supports detection of custom framework patterns.
- * 
- * FEATURES:
- * - UI element type classification (button, input, link, etc.)
- * - Visual pattern recognition
- * - Confidence-based scoring
- * - Accessibility element detection
- * - Framework pattern recognition (React, Vue, Angular)
- * - Interactive element identification
- * 
- * USAGE:
- * const classifier = new UIElementClassifier();
- * const classification = classifier.classifyElement({
- *   tag: 'button',
- *   className: 'btn btn-primary',
- *   text: 'Submit',
- *   bounds: { x: 100, y: 200, width: 120, height: 40 }
- * });
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

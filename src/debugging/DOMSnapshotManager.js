@@ -1,15 +1,11 @@
 /**
- * ============================================================================
- * DOM SNAPSHOT MANAGER - Time-Travel Debugging
- * ============================================================================
- * 
- * Captures and replays DOM snapshots for debugging and analysis.
- * Enables time-travel debugging similar to Cypress.
- * 
- * @author Trent Pierce
- * @license Koda Non-Commercial License
- * @copyright 2026 Trent Pierce
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const fs = require('fs').promises;

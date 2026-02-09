@@ -1,28 +1,11 @@
 /**
- * ============================================================================
- * TRANSITION PREDICTOR - Page State Transition Prediction
- * ============================================================================
- * 
- * Predicts page state transitions and workflow patterns based on historical
- * data and pattern recognition. Provides timing predictions, success
- * probability estimation, and multi-step workflow analysis.
- * 
- * FEATURES:
- * - State transition pattern recognition
- * - Common UI flow detection
- * - Action timing prediction (click delays, load times)
- * - Success probability estimation
- * - Multi-step workflow prediction
- * - Adaptive learning from historical transitions
- * - Transition confidence scoring
- * - Workflow template matching
- * 
- * USAGE:
- * const predictor = new TransitionPredictor();
- * predictor.recordTransition(fromState, toState, action, duration, success);
- * const prediction = predictor.predictTransition(currentState, proposedAction);
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

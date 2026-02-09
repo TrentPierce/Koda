@@ -1,27 +1,11 @@
 /**
- * ============================================================================
- * PERFORMANCE OPTIMIZER - Analysis Pipeline Optimization
- * ============================================================================
- * 
- * Optimizes analysis pipeline performance through intelligent caching,
- * memory management, selective component activation, and resource monitoring.
- * Automatically adapts based on system resources and analysis requirements.
- * 
- * FEATURES:
- * - Multi-layer caching (DOM, screenshot, results)
- * - Memory management and garbage collection optimization
- * - Execution time optimization based on requirements
- * - Selective component activation
- * - Resource monitoring and automatic throttling
- * - Cache invalidation strategies
- * - Performance metrics tracking
- * - Automatic cache cleanup
- * 
- * USAGE:
- * const optimizer = new PerformanceOptimizer({ cacheEnabled: true });
- * const optimized = optimizer.optimizeAnalysis(pageData, options);
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

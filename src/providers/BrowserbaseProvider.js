@@ -1,20 +1,11 @@
 /**
- * BrowserbaseProvider - Cloud browser automation provider
- * Integrates with Browserbase (browserbase.com) for scalable, managed browser instances
- * @module BrowserbaseProvider
- * @version 2.2.0
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
  *
- * IMPORTANT: This is an ORIGINAL implementation that uses Browserbase's public REST API.
- * This code does NOT contain any proprietary Browserbase source code.
- * It makes standard HTTP API calls using axios to interact with Browserbase's service.
- *
- * This implementation:
- * - Uses only the public documented API (https://api.browserbase.com)
- * - Contains 100% original code written for Koda
- * - Uses axios (MIT licensed) for HTTP requests
- * - Complies with all Browserbase terms of service
- *
- * API Documentation: https://docs.browserbase.com
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const axios = require('axios');

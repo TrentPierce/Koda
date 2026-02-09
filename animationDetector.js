@@ -1,29 +1,11 @@
 /**
- * ============================================================================
- * ANIMATION DETECTOR - Animation and Transition Detection
- * ============================================================================
- * 
- * Detects and analyzes animations, transitions, and loading states in web
- * pages. Provides frame rate analysis, loading indicator detection, and
- * animation completion prediction for improved action timing.
- * 
- * FEATURES:
- * - Animation detection (CSS and JavaScript-based)
- * - Loading indicator detection (spinners, progress bars)
- * - Transition duration estimation
- * - Frame rate analysis for smooth animations
- * - Animation completion prediction
- * - Loading state tracking
- * - Animation pattern recognition
- * 
- * USAGE:
- * const detector = new AnimationDetector();
- * const analysis = await detector.analyzeAnimations({
- *   dom, screenshot, previousScreenshot
- * });
- * const isLoading = detector.isPageLoading();
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');

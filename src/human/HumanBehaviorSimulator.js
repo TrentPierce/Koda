@@ -1,15 +1,11 @@
 /**
- * ============================================================================
- * HUMAN BEHAVIOR SIMULATOR - Realistic Mouse & Keyboard Actions
- * ============================================================================
- * 
- * Simulates human-like mouse movements, typing patterns, and behavior
- * to avoid bot detection systems.
- * 
- * @author Trent Pierce
- * @license Koda Non-Commercial License
- * @copyright 2026 Trent Pierce
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 /**

@@ -1,15 +1,11 @@
 /**
- * ============================================================================
- * PAGE ADAPTER - Unified Page Interface
- * ============================================================================
- * 
- * Provides a consistent API across all browser implementations (Puppeteer/Playwright).
- * Handles the differences between browser automation libraries transparently.
- * 
- * @author Trent Pierce
- * @license Koda Non-Commercial License
- * @copyright 2026 Trent Pierce
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const { v4: uuidv4 } = require('uuid');

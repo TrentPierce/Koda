@@ -1,29 +1,11 @@
 /**
- * ============================================================================
- * VISUAL-DOM MAPPER - Visual Element to DOM Node Mapping
- * ============================================================================
- * 
- * Creates mappings between visual elements detected in screenshots and their
- * corresponding DOM nodes. Provides coordinate-based matching, bounding box
- * analysis, and handles complex scenarios like overlapping elements.
- * 
- * FEATURES:
- * - Visual element to DOM node mapping
- * - Coordinate-based element matching
- * - Bounding box intersection analysis
- * - Z-index and visibility calculations
- * - Overlapping element resolution
- * - Click target identification
- * 
- * USAGE:
- * const mapper = new VisualDomMapper();
- * const mapping = await mapper.mapVisualToDom({
- *   visualElements: detectedElements,
- *   domNodes: domTree,
- *   viewport: viewportInfo
- * });
- * 
- * ============================================================================
+ * Koda - Intelligent Browser Automation Library
+ * This project uses Koda by Trent Pierce
+ * https://github.com/TrentPierce/Koda
+ * Licensed under the Koda Non-Commercial License
+ *
+ * Copyright (c) 2026 Trent Pierce. All rights reserved.
+ * See LICENSE file for full terms.
  */
 
 const EventEmitter = require('events');
