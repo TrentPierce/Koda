@@ -21,7 +21,7 @@ class FileTool extends EventEmitter {
     super();
         
     this.config = {
-      baseDir: config.baseDir || process.cwd(),
+      baseDir: path.resolve(config.baseDir || process.cwd()),
       allowedExtensions: config.allowedExtensions || null,
       maxFileSize: config.maxFileSize || 10 * 1024 * 1024, // 10MB
       ...config
@@ -89,7 +89,8 @@ class FileTool extends EventEmitter {
   async read(filePath, encoding = 'utf8') {
     const fullPath = this.resolvePath(filePath);
     this.validatePath(fullPath);
-        
+    await this.rejectSymlinkPath(fullPath);
+
     return await fs.readFile(fullPath, encoding);
   }
     
@@ -100,7 +101,8 @@ class FileTool extends EventEmitter {
   async write(filePath, content, encoding = 'utf8') {
     const fullPath = this.resolvePath(filePath);
     this.validatePath(fullPath);
-        
+    await this.rejectSymlinkPath(fullPath, true);
+
     await fs.writeFile(fullPath, content, encoding);
     return { success: true, path: fullPath };
   }
@@ -112,7 +114,8 @@ class FileTool extends EventEmitter {
   async append(filePath, content, encoding = 'utf8') {
     const fullPath = this.resolvePath(filePath);
     this.validatePath(fullPath);
-        
+    await this.rejectSymlinkPath(fullPath, true);
+
     await fs.appendFile(fullPath, content, encoding);
     return { success: true, path: fullPath };
   }
@@ -124,7 +127,8 @@ class FileTool extends EventEmitter {
   async delete(filePath) {
     const fullPath = this.resolvePath(filePath);
     this.validatePath(fullPath);
-        
+    await this.rejectSymlinkPath(fullPath);
+
     await fs.unlink(fullPath);
     return { success: true, path: fullPath };
   }
@@ -136,7 +140,8 @@ class FileTool extends EventEmitter {
   async list(dirPath) {
     const fullPath = this.resolvePath(dirPath);
     this.validatePath(fullPath);
-        
+    await this.rejectSymlinkPath(fullPath);
+
     const entries = await fs.readdir(fullPath, { withFileTypes: true });
         
     return entries.map(entry => ({
@@ -168,7 +173,8 @@ class FileTool extends EventEmitter {
   async stat(filePath) {
     const fullPath = this.resolvePath(filePath);
     this.validatePath(fullPath);
-        
+    await this.rejectSymlinkPath(fullPath);
+
     const stats = await fs.stat(fullPath);
         
     return {
@@ -181,11 +187,37 @@ class FileTool extends EventEmitter {
     };
   }
     
+
+  /**
+     * Reject symlink paths to prevent traversal via links
+     * @private
+     */
+  async rejectSymlinkPath(fullPath, allowMissing = false) {
+    try {
+      const stats = await fs.lstat(fullPath);
+      if (stats.isSymbolicLink()) {
+        throw new Error('Symlink paths are not allowed');
+      }
+    } catch (error) {
+      if (allowMissing && error.code === 'ENOENT') {
+        return;
+      }
+      if (error.code === 'ENOENT') {
+        throw error;
+      }
+      throw error;
+    }
+  }
+
   /**
      * Resolve path relative to base directory
      * @private
      */
   resolvePath(filePath) {
+    if (!filePath || typeof filePath !== 'string') {
+      throw new Error('A valid file path is required');
+    }
+
     return path.resolve(this.config.baseDir, filePath);
   }
     
@@ -194,12 +226,12 @@ class FileTool extends EventEmitter {
      * @private
      */
   validatePath(fullPath) {
-    // Ensure path is within base directory
-    if (!fullPath.startsWith(this.config.baseDir)) {
+    const relativePath = path.relative(this.config.baseDir, fullPath);
+
+    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
       throw new Error('Path is outside allowed base directory');
     }
-        
-    // Check file extension if restricted
+
     if (this.config.allowedExtensions) {
       const ext = path.extname(fullPath);
       if (!this.config.allowedExtensions.includes(ext)) {

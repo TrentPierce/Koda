@@ -23,7 +23,7 @@ class RestAPIServer extends EventEmitter {
         
     this.options = {
       port: options.port || 3000,
-      host: options.host || '0.0.0.0',
+      host: options.host || '127.0.0.1',
       cors: options.cors !== false,
       auth: options.auth || null,
       rateLimit: options.rateLimit || { windowMs: 60000, max: 100 },
@@ -59,6 +59,12 @@ class RestAPIServer extends EventEmitter {
       this.app.use(cors());
     }
         
+
+    // Rate limiting
+    if (this.options.rateLimit) {
+      this.app.use(this.createRateLimitMiddleware());
+    }
+
     // Body parsing
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true }));
@@ -78,7 +84,7 @@ class RestAPIServer extends EventEmitter {
     if (this.options.auth) {
       this.app.use((req, res, next) => {
         const token = req.headers.authorization?.split(' ')[1];
-        if (this.options.auth.validateToken(token)) {
+        if (typeof this.options.auth.validateToken === 'function' && this.options.auth.validateToken(token)) {
           next();
         } else {
           res.status(401).json({ error: 'Unauthorized' });
@@ -87,6 +93,35 @@ class RestAPIServer extends EventEmitter {
     }
   }
     
+
+  /**
+     * Create in-memory rate limit middleware
+     * @private
+     */
+  createRateLimitMiddleware() {
+    const requestCounts = new Map();
+    const windowMs = this.options.rateLimit.windowMs || 60000;
+    const maxRequests = this.options.rateLimit.max || 100;
+
+    return (req, res, next) => {
+      const key = req.ip || req.socket.remoteAddress || 'unknown';
+      const now = Date.now();
+      const windowStart = now - windowMs;
+
+      const timestamps = requestCounts.get(key) || [];
+      const recent = timestamps.filter(ts => ts > windowStart);
+
+      if (recent.length >= maxRequests) {
+        res.setHeader('Retry-After', Math.ceil(windowMs / 1000));
+        return res.status(429).json({ error: 'Too many requests, please try again later.' });
+      }
+
+      recent.push(now);
+      requestCounts.set(key, recent);
+      next();
+    };
+  }
+
   /**
      * Setup API routes
      * @private
@@ -110,6 +145,10 @@ class RestAPIServer extends EventEmitter {
           return res.status(400).json({
             error: 'provider and apiKey are required'
           });
+        }
+
+        if (typeof provider !== 'string' || typeof apiKey !== 'string') {
+          return res.status(400).json({ error: 'provider and apiKey must be strings' });
         }
                 
         const sessionId = this.generateSessionId();
@@ -149,6 +188,10 @@ class RestAPIServer extends EventEmitter {
           return res.status(404).json({ error: 'Session not found' });
         }
                 
+        if (!url || typeof url !== 'string') {
+          return res.status(400).json({ error: 'url is required' });
+        }
+
         await session.agent.goto(url);
         session.lastActivity = Date.now();
                 

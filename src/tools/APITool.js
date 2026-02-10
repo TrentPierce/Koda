@@ -10,6 +10,7 @@
 
 const axios = require('axios');
 const EventEmitter = require('events');
+const { URL } = require('url');
 
 class APITool extends EventEmitter {
   /**
@@ -23,6 +24,8 @@ class APITool extends EventEmitter {
       timeout: config.timeout || 10000,
       maxRetries: config.maxRetries || 3,
       retryDelay: config.retryDelay || 1000,
+      allowPrivateNetwork: config.allowPrivateNetwork || false,
+      allowedHosts: config.allowedHosts || null,
       ...config
     };
         
@@ -41,7 +44,9 @@ class APITool extends EventEmitter {
      */
   async call(url, options = {}) {
     this.stats.totalCalls++;
-        
+
+    this.validateUrl(url);
+
     const config = {
       url,
       method: options.method || 'GET',
@@ -163,6 +168,64 @@ class APITool extends EventEmitter {
     return this.call(url, { ...options, method: 'DELETE' });
   }
     
+
+  /**
+     * Validate outbound URL against security policy
+     * @private
+     */
+  validateUrl(rawUrl) {
+    let parsed;
+    try {
+      parsed = new URL(rawUrl);
+    } catch {
+      throw new Error('Invalid URL');
+    }
+
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      throw new Error('Only HTTP(S) protocols are allowed');
+    }
+
+    const hostname = parsed.hostname.toLowerCase();
+
+    if (Array.isArray(this.config.allowedHosts) && this.config.allowedHosts.length > 0) {
+      if (!this.config.allowedHosts.includes(hostname)) {
+        throw new Error(`Host '${hostname}' is not in allowedHosts`);
+      }
+      return;
+    }
+
+    if (!this.config.allowPrivateNetwork && this.isPrivateHost(hostname)) {
+      throw new Error(`Access to private host '${hostname}' is blocked`);
+    }
+  }
+
+  /**
+     * Detect private/local hostnames and IP ranges
+     * @private
+     */
+  isPrivateHost(hostname) {
+    if (hostname === 'localhost' || hostname.endsWith('.local')) {
+      return true;
+    }
+
+    if (/^127\./.test(hostname) || hostname === '::1') {
+      return true;
+    }
+
+    if (/^10\./.test(hostname)) return true;
+    if (/^192\.168\./.test(hostname)) return true;
+
+    const match172 = hostname.match(/^172\.(\d{1,3})\./);
+    if (match172) {
+      const secondOctet = Number(match172[1]);
+      if (secondOctet >= 16 && secondOctet <= 31) return true;
+    }
+
+    if (/^169\.254\./.test(hostname)) return true;
+
+    return false;
+  }
+
   /**
      * Get statistics
      * @returns {Object} Statistics

@@ -77,8 +77,8 @@ jobs:
     - name: Try npm install (no optional deps)
       run: |
         echo "=== Attempting npm ci without optional dependencies ==="
-        npm ci --no-optional
-        echo "✅ npm ci --no-optional succeeded!"
+        npm ci --omit=optional
+        echo "✅ npm ci --omit=optional succeeded!"
         
     - name: List installed packages
       run: |
