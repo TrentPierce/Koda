@@ -27,7 +27,7 @@ program
 program
     .command('standalone')
     .description('Run Koda in standalone mode (Electron UI)')
-    .option('-h, --headless', 'Run in headless mode')
+.option('-H, --headless', 'Run in headless mode')
     .action((options) => {
         console.log('Starting Koda in standalone mode...');
 
@@ -74,12 +74,12 @@ program
 
         // Create servers
         const apiServer = new RestAPIServer({
-            port: parseInt(options.port),
+            port: parseInt(options.port, 10),
             host: options.host
         });
 
         const wsServer = new WebSocketServer({
-            port: parseInt(options.wsPort)
+            port: parseInt(options.wsPort, 10)
         });
 
         // Setup event handlers

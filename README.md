@@ -38,6 +38,25 @@ See LICENSE file for full terms.
 
 ---
 
+
+## 🛡️ Security & CI Hardening Updates (Feb 2026)
+
+Recent improvements now live in the codebase:
+
+- REST API now includes built-in request rate limiting and safer default host binding (`127.0.0.1` by default).
+- Tool hardening:
+  - `APITool` blocks private/local network targets by default and supports explicit host allowlists.
+  - `FileTool` enforces stronger path-boundary checks and rejects symlink targets.
+- Packaging reliability:
+  - npm tarballs now include required root-level runtime modules used by the public entrypoint.
+- Release/CI reliability:
+  - `test`, `lint`, and `build` scripts no longer swallow failures.
+  - GitHub workflows use `npm ci --omit=optional --legacy-peer-deps` for cleaner deterministic installs.
+
+See detailed audit and roadmap in `docs/reports/PROJECT_AUDIT_RECOMMENDATIONS.md`.
+
+---
+
 ## 🚀 Quick Start
 
 ### Installation
