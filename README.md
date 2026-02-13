@@ -20,6 +20,7 @@ See LICENSE file for full terms.
 
 [![Tests](https://github.com/TrentPierce/Koda/actions/workflows/ci.yml/badge.svg)](https://github.com/TrentPierce/Koda/actions)
 [![License: Non-Commercial](https://img.shields.io/badge/License-Non--Commercial-red.svg)](LICENSE)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/TrentPierce/Koda)
 
 **Koda** is an intelligent autonomous agent for the web. Unlike traditional scrapers that break easily, Koda uses **Computer Vision** and **Multi-LLM Intelligence** to understand and interact with any web application — just like a human user.
 
